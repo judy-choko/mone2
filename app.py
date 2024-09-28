@@ -16,13 +16,14 @@ import matplotlib.font_manager as fm
 from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime, date
 import calendar
+from  matplotlib import rcParams
 
 load_dotenv()
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 # プッシュ
 # Japanese font
-jp_font = fm.FontProperties(fname='/usr/share/fonts/ipa/IPAexMincho.ttf')
+rcParams['font.family'] = 'Noto Sans CJK JP'
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = SECRET_KEY
@@ -476,7 +477,7 @@ def expense_category_chart():
     values = [expense['total_amount'] for expense in expenses]
     try:
         fig, ax = plt.subplots()
-        ax.pie(values, labels=labels, autopct='%1.1f%%', startangle=90, fontproperties=jp_font)
+        ax.pie(values, labels=labels, autopct='%1.1f%%', startangle=90)
     except Exception as e:
         print(f"Error generating chart: {e}")
         flash('グラフ生成中にエラーが発生しました')
