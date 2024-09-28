@@ -17,6 +17,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime, date
 import calendar
 from  matplotlib import rcParams
+from flask_cors import CORS
 
 load_dotenv()
 
@@ -27,6 +28,7 @@ jp_font = fm.FontProperties(fname='/usr/share/fonts/NotoSansCJKjp/NotoSansCJKjp-
 plt.rcParams['font.family'] = jp_font.get_name()
 
 app = Flask(__name__)
+CORS(app)
 app.config['SECRET_KEY'] = SECRET_KEY
 csrf = CSRFProtect(app)
 
