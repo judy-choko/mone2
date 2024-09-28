@@ -82,7 +82,7 @@ def init_db():
             name TEXT NOT NULL,
             parent_category TEXT NOT NULL,
             user_id INTEGER NOT NULL,
-            FOREIGN KEY (user_id) REFERENCES user(id)
+            FOREIGN KEY (user_id) REFERENCES app_user(id)
         )
     ''')
     conn.commit()
