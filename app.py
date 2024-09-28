@@ -1,12 +1,13 @@
 from flask import Flask, render_template, redirect, url_for, request, flash, Response
+from flask import Flask
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 from models import db, User, DebtType, PaymentTask, ExpenseCategory, Expense, IncomeExpense
 from datetime import datetime
 import io
 import matplotlib.pyplot as plt
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
+
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
