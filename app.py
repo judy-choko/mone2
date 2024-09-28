@@ -43,7 +43,7 @@ def index():
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-     form = RegistrationForm()
+    form = RegistrationForm()
     if form.validate_on_submit():
         new_user = User(username=username)
         password_hash = generate_password_hash(password)
