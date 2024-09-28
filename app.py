@@ -297,12 +297,13 @@ def reset_monthly_income(user_id):
     # ユーザーのリセット日を取得
     cur.execute('SELECT income, expense, remaining_balance, reset_day FROM income_expense WHERE user_id = %s ', (user_id,))
     income_expense = cur.fetchone()
+    conn.commit()
 
     if income_expense:
         reset_day = income_expense['reset_day']
         if today.day == reset_day:
             remaining_balance = income_expense['income'] - income_expense['expense']
-            conn.execute('UPDATE income_expense SET remaining_balance = %s , income = 0, expense = 0 WHERE user_id = %s ',
+            cur.execute('UPDATE income_expense SET remaining_balance = %s , income = 0, expense = 0 WHERE user_id = %s ',
                          (remaining_balance, user_id))
             conn.commit()
     
@@ -602,7 +603,7 @@ def add_expense():
         category_id = form.category_id.data
 
         # データベースに支出を追加
-        conn.execute('INSERT INTO expense (user_id, amount, category_id, description) VALUES (%s, %s, %s, %s)', 
+        cur.execute('INSERT INTO expense (user_id, amount, category_id, description) VALUES (%s, %s, %s, %s)', 
                      (current_user.id, amount, category_id, description))
         conn.commit()
         conn.close()
@@ -669,7 +670,7 @@ def add_debt_type():
 
         # 初回のタスクを自動生成 (例えば、当月の1日に設定)
         due_date = datetime.today().replace(day=1)  # 今月の1日
-        conn.execute('INSERT INTO payment_task (user_id, debt_type_id, debt_name, due_date, monthly_payment,is_completed) VALUES (%s, %s, %s, %s,%s, %s)',
+        cur.execute('INSERT INTO payment_task (user_id, debt_type_id, debt_name, due_date, monthly_payment,is_completed) VALUES (%s, %s, %s, %s,%s, %s)',
                      (current_user.id, new_debt['id'], debt_name, due_date,monthly_payment, False))
         conn.commit()
         conn.close()
