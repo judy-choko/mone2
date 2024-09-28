@@ -9,7 +9,6 @@ WORKDIR /app
 RUN apt-get update && \
     apt-get install -y wget \
     fontconfig \  # ここでfontconfigをインストール
-    fonts-noto-cjk \
     libfreetype6-dev \
     libpng-dev \
     libjpeg-dev \
