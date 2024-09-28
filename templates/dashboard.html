@@ -47,7 +47,8 @@
     <div class="card">
     <h2>今月の収支</h2>
     <p>収入: {{ income_expense.income if income_expense else 0 }}円</p>
-    <p>支出: {{ total_expense }}円</p> 
+    <p>支出: {{ total_expense }}円</p>
+    </div>
     <div class="card">
     <h3>収入を登録</h3>
     <form method="POST" action="{{ url_for('add_income') }}">
@@ -56,7 +57,7 @@
         <input type="number" name="income" required>
         <button type="submit">追加</button>
     </form>
-</div>
+    </div>
     <div class="card">
     <h3>支出を登録</h3>
     <p><a href="{{ url_for('add_expense') }}">支出を追加する</a></p>
