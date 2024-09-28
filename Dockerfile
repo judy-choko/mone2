@@ -42,4 +42,4 @@ RUN flask db migrate || true  # 既存のマイグレーションがない場合
 EXPOSE 8080
 
 # Flaskアプリケーションを起動
-CMD ["gunicorn", "-b", "0.0.0.0:8080", "app:app", "--debug"]
+CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:8080", "app:app"]
