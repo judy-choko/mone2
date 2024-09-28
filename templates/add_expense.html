@@ -19,6 +19,7 @@
     {% endwith %}
     <h1>支出を追加</h1>
     <form method="POST">
+        {{ form.hidden_tag() }}
         <label for="amount">支出額:</label>
         <input type="number" name="amount" required><br>
 
