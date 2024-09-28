@@ -67,7 +67,7 @@ sqlite3.register_converter("timestamp", convert_datetime)
 def init_db():
     print("データベースを構築します")
     conn = create_server_connection()
-    cur = connection.cursor(MySQLdb.cursors.DictCursor)
+    cur = conn.cursor(MySQLdb.cursors.DictCursor)
     conn.execute('''
         CREATE TABLE IF NOT EXISTS user (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
