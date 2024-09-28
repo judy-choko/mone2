@@ -7,7 +7,7 @@
     <title>ダッシュボード</title>
 </head>
 <body>
-        <!-- フラッシュメッセージの表示 -->
+    <!-- フラッシュメッセージの表示 -->
     {% with messages = get_flashed_messages() %}
         {% if messages %}
             <ul class="flashes">
@@ -19,24 +19,58 @@
     {% endwith %}
     <h1>{{ current_user.username }}のダッシュボード</h1>
 
-    <h2>支出カテゴリごとのグラフ</h2>
-    <img src="{{ url_for('expense_category_chart') }}" alt="支出カテゴリ円グラフ">
+    <h2>借金返済タスク</h2>
+    <ul>
+        {% for task in tasks %}
+            <li>
+                {{ task.due_date.strftime('%Y-%m-%d') }} - {{ task.debt_type.name }}
+                {% if task.is_completed %}
+                    <strong>完了</strong>
+                {% else %}
+                    <a href="{{ url_for('complete_task', task_id=task.id) }}">完了する</a>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
 
     <h2>今月の収支</h2>
     <p>収入: {{ income_expense.income if income_expense else 0 }}円</p>
     <p>支出: {{ income_expense.expense if income_expense else 0 }}円</p>
 
-    <!-- タスク登録ボタン -->
-    <h2>タスク管理</h2>
-    <a href="{{ url_for('add_task') }}">
-        <button>タスク登録</button>
-    </a>
+    <h3>収入を登録</h3>
+    <form method="POST">
+        <input type="hidden" name="add_income">
+        <label for="income">収入額:</label>
+        <input type="number" name="income" required>
+        <button type="submit">追加</button>
+    </form>
 
-    <!-- カテゴリ登録ボタン -->
-    <h2>カテゴリ管理</h2>
-    <a href="{{ url_for('add_category') }}">
-        <button>カテゴリ登録</button>
-    </a>
+    <h3>支出を登録</h3>
+    <form method="POST">
+        <input type="hidden" name="add_expense">
+        <label for="expense">支出額:</label>
+        <input type="number" name="expense" required>
+        <button type="submit">追加</button>
+    </form>
+
+    <h2>借金の種類</h2>
+    <ul>
+        {% for debt in debt_types %}
+            <li>{{ debt.name }}: 借金総額 {{ debt.total_debt }}円, 月々の返済額 {{ debt.monthly_payment }}円</li>
+        {% endfor %}
+    </ul>
+
+    <h3>借金の種類を登録</h3>
+    <form method="POST">
+        <input type="hidden" name="add_debt_type">
+        <label for="debt_name">借金の名前:</label>
+        <input type="text" name="debt_name" required>
+        <label for="total_debt">借金総額:</label>
+        <input type="number" name="total_debt" required>
+        <label for="monthly_payment">月々の返済額:</label>
+        <input type="number" name="monthly_payment" required>
+        <button type="submit">追加</button>
+    </form>
 
     <a href="/logout">ログアウト</a>
 </body>
