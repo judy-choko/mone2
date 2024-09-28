@@ -22,10 +22,7 @@ RUN unzip IPAexfont00301.zip
 RUN mkdir -p /usr/share/fonts/ipa
 RUN cp IPAexfont00301/*.ttf /usr/share/fonts/ipa
 RUN fc-cache -fv
- 
-# インストールされたフォントを確認
-RUN fc-cache -fv
-RUN fc-list :family,file | grep "Noto"
+
 
 # 環境変数からパスワードを設定する
 ARG ROOTPASS
