@@ -70,7 +70,7 @@ def init_db():
     cur = conn.cursor()
     cur.execute('''
         CREATE TABLE IF NOT EXISTS app_user (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id INTEGER PRIMARY KEY SERIAL,
             username TEXT NOT NULL,
             password_hash TEXT NOT NULL
         )
