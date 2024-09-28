@@ -135,15 +135,20 @@ def register():
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data).first()
-        if user and check_password_hash(user.password_hash, form.password.data):
-            login_user(user)
-            return redirect(url_for('dashboard'))  # ダッシュボードへリダイレクト
+        # SQLiteでユーザー情報を取得
+        conn = get_db_connection()
+        user = conn.execute('SELECT * FROM user WHERE username = ?', (username,)).fetchone()
+        conn.close()
+        if user and check_password_hash(user['password_hash'], password):
+            user_obj = User(user['id'], user['username'], user['password_hash'])
+            login_user(user_obj)
+            return redirect(url_for('dashboard'))
+        #if user and check_password_hash(user.password_hash, form.password.data):
+        #    login_user(user)
         else:
-            flash('ユーザー名またはパスワードが正しくありません')
+            flash('ユーザー名かパスワードが正しくありません')
     
     return render_template('login.html', form=form)
-
 
 @app.route('/logout')
 @login_required
