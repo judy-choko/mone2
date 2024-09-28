@@ -7,6 +7,7 @@ import os
 from forms import RegistrationForm
 import io
 import matplotlib.pyplot as plt
+from flask_wtf import FlaskForm
 
 app = Flask(__name__)
 
