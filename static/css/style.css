@@ -1,26 +1,40 @@
-/* 全体のスタイル */
+/* 全体の基本スタイル */
 body {
     font-family: 'Arial', sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f4f4f9;
+    background-color: #f8f9fa;
     color: #333;
 }
 
-/* ページ全体の最大幅 */
+/* コンテナの幅設定 */
 .container {
-    max-width: 600px;
-    margin: 20px auto;
+    max-width: 1200px;
+    margin: 0 auto;
     padding: 20px;
-    background-color: white;
+    background-color: #ffffff;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
+    border-radius: 8px;
 }
 
-/* フォームスタイル */
+/* ヘッダーのスタイル */
+header {
+    text-align: center;
+    padding: 20px;
+    background-color: #007bff;
+    color: white;
+}
+
+h1 {
+    font-size: 2.5em;
+    margin: 0;
+}
+
+/* フォームのスタイル */
 form {
     display: flex;
     flex-direction: column;
+    margin-top: 20px;
 }
 
 label {
@@ -29,61 +43,81 @@ label {
     color: #333;
 }
 
-input[type="text"], input[type="password"], input[type="number"], select {
+input[type="text"], input[type="password"], input[type="email"] {
     padding: 10px;
     margin-bottom: 15px;
     border-radius: 5px;
     border: 1px solid #ccc;
     font-size: 1em;
     width: 100%;
-    box-sizing: border-box;
 }
 
 button {
-    background-color: #3498db;
-    color: white;
     padding: 10px;
-    font-size: 1em;
+    background-color: #28a745;
+    color: white;
     border: none;
     border-radius: 5px;
+    font-size: 1.2em;
     cursor: pointer;
 }
 
 button:hover {
-    background-color: #2980b9;
+    background-color: #218838;
 }
 
-h1, h2, h3 {
-    color: #2c3e50;
-    text-align: center;
-}
-
-/* リンクスタイル */
-a {
-    color: #3498db;
-    text-decoration: none;
-}
-
-a:hover {
-    text-decoration: underline;
-}
-
-/* レスポンシブデザイン */
-@media only screen and (max-width: 600px) {
-    .container {
-        padding: 15px;
+/* PCレイアウト用のメディアクエリ */
+@media only screen and (min-width: 768px) {
+    body {
+        padding: 40px;
     }
 
     h1 {
-        font-size: 1.8em;
+        font-size: 3em;
     }
 
-    label {
-        font-size: 1.1em;
+    .container {
+        padding: 40px;
+    }
+
+    form {
+        flex-direction: row;
+        justify-content: space-between;
+    }
+
+    label, input, button {
+        width: 48%;
     }
 
     button {
-        font-size: 1em;
+        width: 20%;
+        align-self: flex-end;
+    }
+}
+
+/* スマホレイアウト用のメディアクエリ */
+@media only screen and (max-width: 767px) {
+    body {
         padding: 10px;
+    }
+
+    h1 {
+        font-size: 2em;
+    }
+
+    .container {
+        padding: 20px;
+    }
+
+    form {
+        flex-direction: column;
+    }
+
+    input, label, button {
+        width: 100%;
+    }
+
+    button {
+        margin-top: 10px;
     }
 }
