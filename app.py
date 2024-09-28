@@ -67,7 +67,7 @@ sqlite3.register_converter("timestamp", convert_datetime)
 def init_db():
     print("データベースを構築します")
     conn = create_server_connection()
-    cur = conn.cursor(MySQLdb.cursors.DictCursor)
+    cur = conn.cursor()
     conn.execute('''
         CREATE TABLE IF NOT EXISTS user (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -260,7 +260,7 @@ def calculate_daily_allowance(income, total_payment, fixed_expenses, total_expen
 # Generate monthly payment tasks automatically
 def create_monthly_tasks():
     conn =  create_server_connection()
-    cur = conn.cursor(MySQLdb.cursors.DictCursor)
+    cur = conn.cursor()
     users = cur.execute('SELECT id FROM user').fetchall()
 
     for user in users:
@@ -280,7 +280,7 @@ scheduler.start()
 
 def reset_monthly_income(user_id):
     conn =  create_server_connection()
-    cur = conn.cursor(MySQLdb.cursors.DictCursor)
+    cur = conn.cursor()
     today = datetime.today()
     # ユーザーのリセット日を取得
     income_expense = cur.execute('SELECT income, expense, remaining_balance, reset_day FROM income_expense WHERE user_id = ?', (user_id,)).fetchone()
@@ -297,7 +297,7 @@ def reset_monthly_income(user_id):
 
 def check_and_reset_incomes():
     conn =  create_server_connection()
-    cur = conn.cursor(MySQLdb.cursors.DictCursor)
+    cur = conn.cursor()
     users = cur.execute('SELECT user_id FROM income_expense').fetchall()
     for user in users:
         reset_monthly_income(user['user_id'])
@@ -310,7 +310,7 @@ scheduler.start()
 @login_manager.user_loader
 def load_user(user_id):
     conn =  create_server_connection()
-    cur = conn.cursor(MySQLdb.cursors.DictCursor)
+    cur = conn.cursor()
     user = cur.execute('SELECT * FROM user WHERE id = ?', (user_id,)).fetchone()
     conn.close()
     if user:
@@ -338,7 +338,7 @@ def register():
             return redirect(url_for('register'))
 
         conn =  create_server_connection()
-        cur = conn.cursor(MySQLdb.cursors.DictCursor)
+        cur = conn.cursor()
         existing_user = cur.execute('SELECT * FROM user WHERE username = ?', (username,)).fetchone()
         if existing_user:
             flash('そのユーザー名は既に使用されています。')
@@ -362,7 +362,7 @@ def login():
         password = form.password.data
         # SQLiteでユーザー情報を取得
         conn =  create_server_connection()
-        cur = conn.cursor(MySQLdb.cursors.DictCursor)
+        cur = conn.cursor()
         user = cur.execute('SELECT * FROM user WHERE username = ?', (username,)).fetchone()
         conn.close()
         if user and check_password_hash(user['password_hash'], password):
@@ -390,7 +390,7 @@ def add_task():
 
     # 借金の種類を取得して選択肢に設定
     conn =  create_server_connection()
-    cur = conn.cursor(MySQLdb.cursors.DictCursor)
+    cur = conn.cursor()
     debt_types = cur.execute('SELECT id, debt_name FROM debt_type WHERE user_id = ?', (current_user.id,)).fetchall()
     form.debt_type_id.choices = [(debt['id'], debt['debt_name']) for debt in debt_types]
     
@@ -398,7 +398,7 @@ def add_task():
         # フォームからデータを取得し、タスクを登録
         debt_type_id = form.debt_type_id.data
         due_date = form.due_date.data
-        cur = conn.cursor(MySQLdb.cursors.DictCursor)
+        cur = conn.cursor()
         cur.execute('INSERT INTO payment_task (user_id, debt_type_id,debt_name,monthly_payment, due_date, is_completed) VALUES (?, ?, ?, ?)', 
                      (current_user.id, debt_type_id, due_date, False))
         conn.commit()
@@ -413,7 +413,7 @@ def add_task():
 @login_required
 def complete_task(task_id):
     conn =  create_server_connection()
-    cur = conn.cursor(MySQLdb.cursors.DictCursor)
+    cur = conn.cursor()
     cur.execute('UPDATE payment_task SET is_completed = 1 WHERE id = ? AND user_id = ?', (task_id, current_user.id))
     conn.commit()
     conn.close()
@@ -428,7 +428,7 @@ def set_reset_day():
     if form.validate_on_submit():
         reset_day = form.reset_day.data
         conn =  create_server_connection()
-        cur = conn.cursor(MySQLdb.cursors.DictCursor)
+        cur = conn.cursor()
         cur.execute('UPDATE income_expense SET reset_day = ? WHERE user_id = ?', (reset_day, current_user.id))
         conn.commit()
         conn.close()
@@ -440,7 +440,7 @@ def set_reset_day():
 @login_required
 def dashboard():
     conn = create_server_connection()
-    cur = conn.cursor(MySQLdb.cursors.DictCursor)
+    cur = conn.cursor()
     # 支出の合計を取得
     total_expense = cur.execute('SELECT SUM(amount) FROM expense WHERE user_id = ?', (current_user.id,)).fetchone()
     total_expenses = total_expense[0] if total_expense[0] is not None else 0
@@ -499,7 +499,7 @@ def dashboard():
 @login_required
 def expense_category_chart():
     conn = create_server_connection()
-    cur = conn.cursor(MySQLdb.cursors.DictCursor)
+    cur = conn.cursor()
     expenses = cur.execute('''
         SELECT expense_category.name, SUM(expense.amount) as total_amount 
         FROM expense
@@ -536,7 +536,7 @@ def add_category():
 
         # カテゴリをデータベースに追加
         conn = create_server_connection()
-        cur = conn.cursor(MySQLdb.cursors.DictCursor)
+        cur = conn.cursor()
         cur.execute('INSERT INTO expense_category (name, parent_category, user_id) VALUES (?, ?, ?)', 
                      (category_name, parent_category, current_user.id))
         conn.commit()
@@ -555,7 +555,7 @@ def add_expense():
 
     # カテゴリのリストをデータベースから取得
     conn = create_server_connection()
-    cur = conn.cursor(MySQLdb.cursors.DictCursor)
+    cur = conn.cursor()
     fixed_categories = cur.execute('SELECT * FROM expense_category WHERE parent_category = ? AND user_id = ?', ('固定費', current_user.id)).fetchall()
     variable_categories = cur.execute('SELECT * FROM expense_category WHERE parent_category = ? AND user_id = ?', ('変動費', current_user.id)).fetchall()
 
@@ -589,7 +589,7 @@ def add_income():
         
         # データベースに収入を追加
         conn = get_db_connection()
-        cur = conn.cursor(MySQLdb.cursors.DictCursor)
+        cur = conn.cursor()
         # 既存の収入/支出データがあるか確認
         income_expense = cur.execute('SELECT * FROM income_expense WHERE user_id = ?', (current_user.id,)).fetchone()
 
@@ -621,7 +621,7 @@ def add_debt_type():
 
         # データベースに借金の種類を追加
         conn = create_server_connection()
-        cur = conn.cursor(MySQLdb.cursors.DictCursor)
+        cur = conn.cursor()
         cur.execute('INSERT INTO debt_type (debt_name, total_debt, monthly_payment, user_id) VALUES (?, ?, ?, ?)',
                      (debt_name, total_debt, monthly_payment, current_user.id))
         conn.commit()
