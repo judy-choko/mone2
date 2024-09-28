@@ -621,7 +621,7 @@ def add_income():
         income = income_form.income.data
         
         # データベースに収入を追加
-        conn = get_db_connection()
+        conn = create_server_connection()
         cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
         # 既存の収入/支出データがあるか確認
         cur.execute('SELECT * FROM income_expense WHERE user_id = %s ', (current_user.id,))
