@@ -8,7 +8,7 @@ from forms import RegistrationForm
 import io
 import matplotlib.pyplot as plt
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField  # 必要なフィールドをインポート
+from wtforms import StringField, IntegerField, SelectField, SubmitField
 from wtforms.validators import DataRequired
 
 app = Flask(__name__)
