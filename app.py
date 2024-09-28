@@ -24,7 +24,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # プッシュ
 # Japanese font
 jp_font = fm.FontProperties(fname='/usr/share/fonts/NotoSansCJKjp/NotoSansCJKjp-Regular.otf: Noto Sans CJK JP,Noto Sans CJK JP Regular:style=Regular')
-
+plt.rcParams['font.family'] = jp_font.get_name()
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = SECRET_KEY
@@ -479,7 +479,7 @@ def expense_category_chart():
     print(labels,values)
     try:
         fig, ax = plt.subplots()
-        ax.pie(values, labels=labels, autopct='%1.1f%%', startangle=90, fontproperties=jp_font)
+        wedges, texts, autotexts = ax.pie(values, labels=labels, autopct='%1.1f%%', startangle=90)
         ax.axis('equal')
         img = io.BytesIO()
         plt.savefig(img, format='png')
@@ -606,8 +606,6 @@ def add_debt_type():
 
 
 if __name__ == '__main__':
-    fonts = fm.findSystemFonts()
-    print([[str(font), fm.FontProperties(fname=font).get_name()] for font in fonts[:10]])
     with app.app_context():
         init_db()  # アプリ起動時にデータベースを初期化
     app.run(host="0.0.0.0", port=8080, debug=True)
