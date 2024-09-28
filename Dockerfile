@@ -4,19 +4,27 @@ FROM python:3.9-slim
 # 作業ディレクトリを作成
 WORKDIR /app
 
-# 必要なパッケージをシステムにインストール
-# pipの最新バージョンをインストール
-RUN apt-get update && apt-get install -y --no-install-recommends gcc \
+# 必要なパッケージをインストールし、pipをアップグレード
+RUN apt-get update && apt-get install -y --no-install-recommends gcc sudo \
     && pip install --upgrade pip
 
-# 必要なパッケージをインストール
-COPY requirements.txt requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+# 環境変数からパスワードを設定する
+ARG ROOTPASS
+RUN useradd -ms /bin/bash chokokaruros && echo "chokokaruros:$ROOTPASS" | chpasswd
+
+# sudo 権限を追加
+RUN usermod -aG sudo chokokaruros
 
 # アプリケーションコードをコピー
-COPY . .
+COPY --chown=chokokaruros:chokokaruros . .
 
-# Flaskアプリを起動するための環境変数を設定
+# chokokarurosユーザーに切り替える
+USER chokokaruros
+
+# 必要なパッケージをインストール
+RUN pip install --no-cache-dir -r requirements.txt
+
+# 環境変数の設定
 ENV FLASK_APP=app.py
 ENV FLASK_ENV=production
 
