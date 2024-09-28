@@ -7,6 +7,7 @@
     <title>ログイン</title>
 </head>
 <body>
+    <div class="card">
         <!-- フラッシュメッセージの表示 -->
     {% with messages = get_flashed_messages() %}
         {% if messages %}
@@ -28,7 +29,7 @@
 
         <button type="submit">ログイン</button>
     </form>
-
+    </div>
     <p>アカウントをお持ちでない場合は、<a href="{{ url_for('register') }}">こちら</a>から登録してください。</p>
 </body>
 </html>
