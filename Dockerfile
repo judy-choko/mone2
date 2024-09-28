@@ -25,8 +25,11 @@ USER chokokaruros
 RUN pip install --no-cache-dir -r requirements.txt
 
 # 環境変数の設定
+ENV FLASK_ENV=development
 ENV FLASK_APP=app.py
-ENV FLASK_ENV=production
+
+# ENV FLASK_ENV=production
+
 ENV PATH="/home/chokokaruros/.local/bin:$PATH"
 
 # データベースのマイグレーションとアップグレードを実行
@@ -39,4 +42,4 @@ RUN flask db migrate || true  # 既存のマイグレーションがない場合
 EXPOSE 8080
 
 # Flaskアプリケーションを起動
-CMD ["gunicorn", "-b", "0.0.0.0:8080", "app:app"]
+CMD ["gunicorn", "-b", "0.0.0.0:8080", "app:app", "--debug"]
