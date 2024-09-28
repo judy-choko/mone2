@@ -33,21 +33,38 @@
         {% endfor %}
     </ul>
 
+    <!-- タスク追加フォーム -->
+    <h3>タスクを登録</h3>
+    <form method="POST" action="{{ url_for('add_task') }}">
+        {{ form.hidden_tag() }}  <!-- CSRFトークン -->
+        <label for="debt_type">借金の種類:</label>
+        <select name="debt_type_id" required>
+            {% for debt in debt_types %}
+                <option value="{{ debt.id }}">{{ debt.name }}</option>
+            {% endfor %}
+        </select><br>
+
+        <label for="due_date">期日:</label>
+        <input type="date" name="due_date" required><br>
+
+        <button type="submit">タスクを追加</button>
+    </form>
+
     <h2>今月の収支</h2>
     <p>収入: {{ income_expense.income if income_expense else 0 }}円</p>
     <p>支出: {{ income_expense.expense if income_expense else 0 }}円</p>
 
     <h3>収入を登録</h3>
-    <form method="POST">
-        <input type="hidden" name="add_income">
+    <form method="POST" action="{{ url_for('add_income') }}">
+        {{ form.hidden_tag() }}  <!-- CSRFトークン -->
         <label for="income">収入額:</label>
         <input type="number" name="income" required>
         <button type="submit">追加</button>
     </form>
 
     <h3>支出を登録</h3>
-    <form method="POST">
-        <input type="hidden" name="add_expense">
+    <form method="POST" action="{{ url_for('add_expense') }}">
+        {{ form.hidden_tag() }}  <!-- CSRFトークン -->
         <label for="expense">支出額:</label>
         <input type="number" name="expense" required>
         <button type="submit">追加</button>
@@ -61,8 +78,8 @@
     </ul>
 
     <h3>借金の種類を登録</h3>
-    <form method="POST">
-        <input type="hidden" name="add_debt_type">
+    <form method="POST" action="{{ url_for('add_debt_type') }}">
+        {{ form.hidden_tag() }}  <!-- CSRFトークン -->
         <label for="debt_name">借金の名前:</label>
         <input type="text" name="debt_name" required>
         <label for="total_debt">借金総額:</label>
@@ -72,6 +89,6 @@
         <button type="submit">追加</button>
     </form>
 
-    <a href="/logout">ログアウト</a>
+    <a href="{{ url_for('logout') }}">ログアウト</a>
 </body>
 </html>
