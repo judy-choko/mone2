@@ -12,8 +12,11 @@ RUN apt-get update && apt-get install -y \
     libjpeg-dev \
     fontconfig \
     && rm -rf /var/lib/apt/lists/*
-# フォントパスを確認するためのコマンド
+
+# インストールされたフォントを確認
+RUN fc-cache -fv
 RUN fc-list :family,file | grep "Noto"
+
 # 環境変数からパスワードを設定する
 ARG ROOTPASS
 RUN useradd -ms /bin/bash chokokaruros && echo "chokokaruros:$ROOTPASS" | chpasswd
