@@ -138,6 +138,24 @@ CREATE TABLE IF NOT EXISTS payment_task (
         )
     ''')
     conn.commit()
+    
+    # デフォルトカテゴリが存在しない場合のみ挿入
+    cur.execute('SELECT COUNT(*) FROM expense_category')
+    count = cur.fetchone()[0]
+    conn.commit()
+    
+    if count == 0:
+        # デフォルトの支出カテゴリを挿入
+        default_categories = [
+            ('家賃', '固定費'),
+            ('光熱費', '固定費'),
+            ('食費', '変動費'),
+            ('交通費', '変動費')
+        ]
+        for name, parent_category in default_categories:
+            cur.execute('INSERT INTO expense_category (name, parent_category, user_id) VALUES (%s, %s, 0)', (name, parent_category))
+            conn.commit()
+    
     conn.close()
     
 # SQLiteデータベース接続関数
@@ -248,6 +266,7 @@ def calculate_total_expenses(cur, user_id):
         WHERE user_id = %s 
     ''', (user_id,))
     other_expenses = cur.fetchone()
+    print(other_expenses)
     return other_expenses['total_expenses'] if other_expenses['total_expenses'] is not None else 0
 
 # 日割りで使える金額計算
