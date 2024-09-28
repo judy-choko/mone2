@@ -7,7 +7,7 @@ WORKDIR /app
 
 # パッケージリストの更新と必要なパッケージのインストール
 RUN apt-get update && \
-    apt-get install -y wget fontconfig zip unzip libfreetype6-dev libpng-dev libjpeg-dev && \
+    apt-get install -y wget fontconfig zip unzip libfreetype6-dev libpng-dev libjpeg-dev
 
 # IPAフォントをダウンロードしてインストール
 RUN wget https://moji.or.jp/wp-content/ipafont/IPAexfont/IPAexfont00301.zip && \
