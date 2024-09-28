@@ -8,13 +8,17 @@ from datetime import datetime
 import io
 import matplotlib.pyplot as plt
 from werkzeug.security import generate_password_hash
+from flask_wtf.csrf import CSRFProtect
 
 app = Flask(__name__)
+
+app.config['SECRET_KEY'] = os.urandom(32)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['PREFERRED_URL_SCHEME'] = 'https'
-app.config['SECRET_KEY'] = 'your_secret_key'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
 
+csrf = CSRFProtect()
+csrf.init_app(app)
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)  # Flask-Migrateの初期化
