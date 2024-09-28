@@ -32,10 +32,8 @@ ENV FLASK_APP=app.py
 
 ENV PATH="/home/chokokaruros/.local/bin:$PATH"
 
-# データベースのマイグレーションとアップグレードを実行
-RUN flask db init  # 初回のみ
-RUN flask db migrate
-RUN flask db upgrade
+# SQLiteデータベースの初期化（テーブル作成などを行うスクリプトを実行）
+RUN python -c 'from your_app import init_db; init_db()'
 
 # ポート5000をコンテナ外部に公開
 EXPOSE 8080
