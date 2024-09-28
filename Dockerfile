@@ -30,8 +30,10 @@ ENV FLASK_ENV=production
 ENV PATH="/home/chokokaruros/.local/bin:$PATH"
 
 # データベースのマイグレーションとアップグレードを実行
-RUN flask db migrate || true  # 既存のマイグレーションがない場合でもエラーを無視
+RUN flask db init  # 初回のみ
 RUN flask db upgrade
+RUN flask db migrate || true  # 既存のマイグレーションがない場合でもエラーを無視
+
 
 # ポート5000をコンテナ外部に公開
 EXPOSE 8080
