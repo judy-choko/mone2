@@ -7,12 +7,14 @@ WORKDIR /app
 
 # 必要なパッケージをインストールし、pipをアップグレード
 RUN apt-get update && apt-get install -y \
+
     fonts-noto-cjk \
     libfreetype6-dev \
     libpng-dev \
     libjpeg-dev \
     fontconfig \
     && rm -rf /var/lib/apt/lists/*
+RUN apt-get install -y wget
 RUN apt-get update && apt-get install -y \
 　　wget &&\
 　　zip unzip &&\
