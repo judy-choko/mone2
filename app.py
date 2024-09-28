@@ -476,6 +476,7 @@ def expense_category_chart():
 
     labels = [expense['name'] for expense in expenses]
     values = [expense['total_amount'] for expense in expenses]
+    print(labels,values)
     try:
         fig, ax = plt.subplots()
         ax.pie(values, labels=labels, autopct='%1.1f%%', startangle=90, fontproperties=jp_font)
