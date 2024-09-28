@@ -1,9 +1,11 @@
-numpy==1.21.0
+numpy
 Flask-Migrate
 Flask-WTF
 Flask
 Flask-Login
-matplotlib==3.4.2
+matplotlib
 Werkzeug
 gunicorn
 wtforms
+python-dotenv
+APScheduler
