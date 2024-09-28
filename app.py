@@ -84,15 +84,6 @@ class TaskForm(FlaskForm):
     due_date = DateField('期日', validators=[DataRequired()])
     submit = SubmitField('タスクを追加')
     
-@login_manager.user_loader
-def load_user(user_id):
-    conn = get_db_connection()
-    user = conn.execute('SELECT * FROM user WHERE id = ?', (user_id,)).fetchone()
-    conn.close()
-    if user:
-        return User(user['id'], user['username'], user['password_hash'])
-    return None
-
 class User:
     def __init__(self, id, username, password_hash):
         self.id = id
@@ -119,7 +110,17 @@ class User:
 
     def get_id(self):
         return str(self.id)
+        
+@login_manager.user_loader
+def load_user(user_id):
+    conn = get_db_connection()
+    user = conn.execute('SELECT * FROM user WHERE id = ?', (user_id,)).fetchone()
+    conn.close()
+    if user:
+        return User(user['id'], user['username'], user['password_hash'])
+    return None
 
+    
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if current_user.is_authenticated:
