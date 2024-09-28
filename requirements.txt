@@ -10,3 +10,5 @@ wtforms
 python-dotenv
 APScheduler
 flask-cors
+mysql-connector-python
+mysqlclient
