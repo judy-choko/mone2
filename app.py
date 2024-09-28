@@ -473,16 +473,13 @@ def expense_category_chart():
 
     labels = [expense['name'] for expense in expenses]
     values = [expense['total_amount'] for expense in expenses]
-
-    fig, ax = plt.subplots()
-    ax.pie(values, labels=labels, autopct='%1.1f%%', startangle=90, fontproperties=jp_font)
-    ax.axis('equal')
-
-    img = io.BytesIO()
-    plt.savefig(img, format='png')
-    img.seek(0)
-    
-    return Response(img.getvalue(), mimetype='image/png')
+    try:
+        fig, ax = plt.subplots()
+        ax.pie(values, labels=labels, autopct='%1.1f%%', startangle=90, fontproperties=jp_font)
+    except Exception as e:
+        print(f"Error generating chart: {e}")
+        flash('グラフ生成中にエラーが発生しました')
+        return redirect(url_for('dashboard'))
 
 # カテゴリ追加ルート
 @app.route('/add_category', methods=['GET', 'POST'])
