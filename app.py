@@ -482,7 +482,7 @@ def expense_category_chart():
         wedges, texts, autotexts = ax.pie(values, labels=labels, autopct='%1.1f%%', startangle=90)
         ax.axis('equal')
         img = io.BytesIO()
-        plt.savefig(img, format='png')
+        plt.savefig(img, format='png', dpi=150)  # dpi=300 で解像度を設定
         img.seek(0)
         return Response(img.getvalue(), mimetype='image/png')
     except Exception as e:
