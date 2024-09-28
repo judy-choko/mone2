@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>ユーザー登録</title>
+</head>
+<body>
+    <h1>ユーザー登録</h1>
+    <form method="POST">
+        <label for="username">ユーザー名:</label>
+        <input type="text" name="username" required><br>
+
+        <label for="password">パスワード:</label>
+        <input type="password" name="password" required><br>
+
+        <label for="confirm_password">パスワード確認:</label>
+        <input type="password" name="confirm_password" required><br>
+
+        <button type="submit">登録する</button>
+    </form>
+
+    <p>既にアカウントをお持ちですか？ <a href="{{ url_for('login') }}">ログイン</a></p>
+</body>
+</html>
