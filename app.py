@@ -45,13 +45,6 @@ def index():
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
-        new_user = User(username=username)
-        password_hash = generate_password_hash(password)
-        new_user.set_password(password_hash)
-        db.session.add(new_user)
-        db.session.commit()
-        return redirect(url_for('dashboard'))
-    if request.method == 'POST':
         username = request.form.get('username')  # フォームからのデータ取得
         password = request.form.get('password')
         confirm_password = request.form.get('confirm_password')
@@ -70,12 +63,18 @@ def register():
             flash('全てのフィールドを入力してください')
             return redirect(url_for('register'))
             
-
-
+        new_user = User(username=username)
+        password_hash = generate_password_hash(password)
+        new_user.set_password(password_hash)
+        db.session.add(new_user)
+        db.session.commit()
         flash('登録が成功しました！ログインしてください。')
-        return redirect(url_for('login'))
-
-    return render_template('register.html')
+        return redirect(url_for('dashboard'))
+        
+    else:
+        if request.method == 'POST':
+            flash('フォームの送信に失敗しました。もう一度お試しください。')
+            return render_template('register.html', form=form)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
