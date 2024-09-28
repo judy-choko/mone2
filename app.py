@@ -275,7 +275,7 @@ def create_monthly_tasks():
         debt_types = cur.fetchall()
         conn.commit()
         for debt in debt_types:
-            cur.execute('INSERT INTO payment_task (user_id, debt_name, debt_type_id, monthly_payment, due_date, is_completed) VALUES (?, ?, ?, ?, ?, ?)', 
+            cur.execute('INSERT INTO payment_task (user_id, debt_name, debt_type_id, monthly_payment, due_date, is_completed) VALUES (%s, %s, %s, %s, %s, %s)', 
              (user['id'], debt['debt_name'], debt['id'], debt['monthly_payment'], datetime.today().replace(day=1), False))
 
     conn.commit()
@@ -358,7 +358,7 @@ def register():
             return redirect(url_for('register'))
 
         hashed_password = generate_password_hash(password)
-        cur.execute('INSERT INTO app_user (username, password_hash) VALUES (?, ?)', (username, hashed_password))
+        cur.execute('INSERT INTO app_user (username, password_hash) VALUES (%s, %s)', (username, hashed_password))
         conn.commit()
         conn.close()
 
@@ -414,7 +414,7 @@ def add_task():
         debt_type_id = form.debt_type_id.data
         due_date = form.due_date.data
         cur = conn.cursor()
-        cur.execute('INSERT INTO payment_task (user_id, debt_type_id,debt_name,monthly_payment, due_date, is_completed) VALUES (?, ?, ?, ?)', 
+        cur.execute('INSERT INTO payment_task (user_id, debt_type_id,debt_name,monthly_payment, due_date, is_completed) VALUES (%s, %s, %s, %s)', 
                      (current_user.id, debt_type_id, due_date, False))
         conn.commit()
         conn.close()
@@ -563,7 +563,7 @@ def add_category():
         # カテゴリをデータベースに追加
         conn = create_server_connection()
         cur = conn.cursor()
-        cur.execute('INSERT INTO expense_category (name, parent_category, user_id) VALUES (?, ?, ?)', 
+        cur.execute('INSERT INTO expense_category (name, parent_category, user_id) VALUES (%s, %s, %s)', 
                      (category_name, parent_category, current_user.id))
         conn.commit()
         conn.close()
@@ -599,7 +599,7 @@ def add_expense():
         category_id = form.category_id.data
 
         # データベースに支出を追加
-        conn.execute('INSERT INTO expense (user_id, amount, category_id, description) VALUES (?, ?, ?, ?)', 
+        conn.execute('INSERT INTO expense (user_id, amount, category_id, description) VALUES (%s, %s, %s, %s)', 
                      (current_user.id, amount, category_id, description))
         conn.commit()
         conn.close()
@@ -627,10 +627,10 @@ def add_income():
 
         if income_expense:
             # 既存データがあれば更新
-            cur.execute('UPDATE income_expense SET income = income + ? WHERE user_id = %s ', (income, current_user.id))
+            cur.execute('UPDATE income_expense SET income = income + %s WHERE user_id = %s ', (income, current_user.id))
         else:
             # 新規にデータを作成
-            cur.execute('INSERT INTO income_expense (user_id, income, expense) VALUES (?, ?, 0)', (current_user.id, income))
+            cur.execute('INSERT INTO income_expense (user_id, income, expense) VALUES (%s, %s, 0)', (current_user.id, income))
         
         conn.commit()
         conn.close()
@@ -654,7 +654,7 @@ def add_debt_type():
         # データベースに借金の種類を追加
         conn = create_server_connection()
         cur = conn.cursor()
-        cur.execute('INSERT INTO debt_type (debt_name, total_debt, monthly_payment, user_id) VALUES (?, ?, ?, ?)',
+        cur.execute('INSERT INTO debt_type (debt_name, total_debt, monthly_payment, user_id) VALUES (%s, %s, %s, %s)',
                      (debt_name, total_debt, monthly_payment, current_user.id))
         conn.commit()
 
@@ -666,7 +666,7 @@ def add_debt_type():
 
         # 初回のタスクを自動生成 (例えば、当月の1日に設定)
         due_date = datetime.today().replace(day=1)  # 今月の1日
-        conn.execute('INSERT INTO payment_task (user_id, debt_type_id, debt_name, due_date, monthly_payment,is_completed) VALUES (?, ?, ?, ?,?, ?)',
+        conn.execute('INSERT INTO payment_task (user_id, debt_type_id, debt_name, due_date, monthly_payment,is_completed) VALUES (%s, %s, %s, %s,%s, %s)',
                      (current_user.id, new_debt['id'], debt_name, due_date,monthly_payment, False))
         conn.commit()
         conn.close()
