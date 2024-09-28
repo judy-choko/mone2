@@ -30,7 +30,7 @@ ENV FLASK_ENV=production
 ENV PATH="/home/chokokaruros/.local/bin:$PATH"
 
 # ポート5000をコンテナ外部に公開
-EXPOSE 5000
+EXPOSE 8080
 
 # Flaskアプリケーションを起動
 ENTRYPOINT ["flask", "run", "--host=0.0.0.0"]
