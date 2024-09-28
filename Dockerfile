@@ -4,24 +4,16 @@ FROM python:3.9-slim
 # 作業ディレクトリを作成
 WORKDIR /app
 
-# 必要なパッケージをインストールし、pipをアップグレード
-RUN apt-get update && apt-get install -y \
-    fonts-noto-cjk \
-    libfreetype6-dev \
-    libpng-dev \
-    libjpeg-dev \
-    fontconfig \
-    && rm -rf /var/lib/apt/lists/*
 
-RUN apt-get update &&\
-　　apt-get install -y wget &&\
-　　apt-get install -y zip unzip &&\
-　　apt-get install -y fontconfig
-RUN wget https://moji.or.jp/wp-content/ipafont/IPAexfont/IPAexfont00301.zip
-RUN unzip IPAexfont00301.zip
-RUN mkdir -p /usr/share/fonts/ipa
-RUN cp IPAexfont00301/*.ttf /usr/share/fonts/ipa
-RUN fc-cache -fv
+RUN apk add --no-cache curl fontconfig &&\
+　　curl -O https://moji.or.jp/wp-content/ipafont/IPAexfont/IPAexfont00301.zip && \
+　　mkdir -p /usr/share/fonts/ipa && \
+　　mkdir -p /temp && \
+　　unzip IPAexfont00301.zip -d /temp && \
+　　cp /temp/IPAexfont00301/*.ttf /usr/share/fonts/ipa/ && \
+　　rm IPAexfont00301.zip
+RUN rm -rf /temp && \
+　　fc-cache -fv
  
 # インストールされたフォントを確認
 RUN fc-cache -fv
