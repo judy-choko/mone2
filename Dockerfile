@@ -10,9 +10,10 @@ RUN apt-get update && apt-get install -y \
     libfreetype6-dev \
     libpng-dev \
     libjpeg-dev \
-    && fc-list :family,file | grep "Noto" \
+    fontconfig \
     && rm -rf /var/lib/apt/lists/*
-
+# フォントパスを確認するためのコマンド
+RUN fc-list :family,file | grep "Noto"
 # 環境変数からパスワードを設定する
 ARG ROOTPASS
 RUN useradd -ms /bin/bash chokokaruros && echo "chokokaruros:$ROOTPASS" | chpasswd
