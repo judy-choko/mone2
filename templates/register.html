@@ -7,6 +7,16 @@
     <title>ユーザー登録</title>
 </head>
 <body>
+        <!-- フラッシュメッセージの表示 -->
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul class="flashes">
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
     <h1>ユーザー登録</h1>
     <form method="POST">
     {{ form.hidden_tag() }}  <!-- CSRFトークン -->
