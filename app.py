@@ -21,6 +21,8 @@ from flask_cors import CORS
 import mysql.connector
 import MySQLdb
 import psycopg2
+import psycopg2.extras 
+
 load_dotenv()
 
 SECRET_KEY = os.getenv("SECRET_KEY")
