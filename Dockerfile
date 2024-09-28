@@ -5,25 +5,22 @@ FROM python:3.9-slim
 WORKDIR /app
 
 
-# 必要なパッケージをインストールし、pipをアップグレード
-RUN apt-get update && apt-get install -y \
-
+# パッケージリストの更新と必要なパッケージのインストール
+RUN apt-get update && \
+    apt-get install -y wget \
     fonts-noto-cjk \
     libfreetype6-dev \
     libpng-dev \
     libjpeg-dev \
-    fontconfig \
+    unzip \
     && rm -rf /var/lib/apt/lists/*
-RUN apt-get install -y wget
-RUN apt-get update && apt-get install -y \
-　　wget &&\
-　　zip unzip &&\
-　　fontconfig
-RUN wget https://moji.or.jp/wp-content/ipafont/IPAexfont/IPAexfont00301.zip
-RUN unzip IPAexfont00301.zip
-RUN mkdir -p /usr/share/fonts/ipa
-RUN cp IPAexfont00301/*.ttf /usr/share/fonts/ipa
-RUN fc-cache -fv
+
+# IPAフォントをダウンロードしてインストール
+RUN wget https://moji.or.jp/wp-content/ipafont/IPAexfont/IPAexfont00301.zip && \
+    unzip IPAexfont00301.zip && \
+    mkdir -p /usr/share/fonts/ipa && \
+    cp IPAexfont00301/*.ttf /usr/share/fonts/ipa/ && \
+    fc-cache -fv
 
 
 # 環境変数からパスワードを設定する
