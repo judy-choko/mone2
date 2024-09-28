@@ -94,7 +94,7 @@ def init_db():
             category_id INTEGER NOT NULL,
             description TEXT NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (user_id) REFERENCES user(id),
+            FOREIGN KEY (user_id) REFERENCES app_user(id),
             FOREIGN KEY (category_id) REFERENCES expense_category(id)
         )
     ''')
@@ -108,7 +108,7 @@ CREATE TABLE IF NOT EXISTS payment_task (
     monthly_payment INTEGER NOT NULL,                
     due_date TIMESTAMP NOT NULL,  -- TIMESTAMP to store both date and time
     is_completed BOOLEAN NOT NULL DEFAULT 0,
-    FOREIGN KEY(user_id) REFERENCES user(id),
+    FOREIGN KEY(user_id) REFERENCES app_user(id),
     FOREIGN KEY(debt_type_id) REFERENCES debt_type(id)
     );
     ''')
@@ -120,7 +120,7 @@ CREATE TABLE IF NOT EXISTS payment_task (
         debt_name TEXT NOT NULL,
         total_debt INTEGER NOT NULL,
         monthly_payment INTEGER NOT NULL,
-        FOREIGN KEY(user_id) REFERENCES user(id)
+        FOREIGN KEY(user_id) REFERENCES app_user(id)
         )
     ''')
     conn.commit()
@@ -132,7 +132,7 @@ CREATE TABLE IF NOT EXISTS payment_task (
         expense INTEGER DEFAULT 0,
         remaining_balance INTEGER DEFAULT 0,
         reset_day INTEGER DEFAULT 1 NOT NULL,  -- NULL不可でデフォルトを1日に
-        FOREIGN KEY(user_id) REFERENCES user(id)
+        FOREIGN KEY(user_id) REFERENCES app_user(id)
         )
     ''')
     conn.commit()
