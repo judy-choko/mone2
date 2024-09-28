@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>支出を追加</title>
+</head>
+<body>
+    <h1>支出を追加</h1>
+    <form method="POST">
+        <label for="amount">支出額:</label>
+        <input type="number" name="amount" required><br>
+
+        <label for="description">説明:</label>
+        <input type="text" name="description" required><br>
+
+        <label for="category_id">カテゴリ（固定費）:</label>
+        <select name="category_id">
+            {% for category in fixed_categories %}
+            <option value="{{ category.id }}">{{ category.name }}</option>
+            {% endfor %}
+        </select><br>
+
+        <label for="category_id">カテゴリ（変動費）:</label>
+        <select name="category_id">
+            {% for category in variable_categories %}
+            <option value="{{ category.id }}">{{ category.name }}</option>
+            {% endfor %}
+        </select><br>
+
+        <button type="submit">支出を追加</button>
+    </form>
+
+    <a href="{{ url_for('dashboard') }}">ダッシュボードに戻る</a>
+</body>
+</html>
