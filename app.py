@@ -1,5 +1,4 @@
 from flask import Flask, render_template, redirect, url_for, request, flash, Response
-from flask import Flask
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -19,13 +18,10 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['PREFERRED_URL_SCHEME'] = 'https'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
 
-csrf = CSRFProtect()
-csrf.init_app(app)
+csrf = CSRFProtect(app)
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)  # Flask-Migrateの初期化
-
-db.init_app(app)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -35,7 +31,7 @@ login_manager.login_view = 'login'
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-@app.route('/',methods=['GET', 'POST'])
+@app.route('/', methods=['GET', 'POST'])
 def index():
     if current_user.is_authenticated:
         return redirect(url_for('dashboard'))
@@ -45,10 +41,9 @@ def index():
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
-        username = request.form.get('username')  # フォームからのデータ取得
-        password = request.form.get('password')
-        confirm_password = request.form.get('confirm_password')
-        print(username,password,confirm_password)
+        username = form.username.data  # フォームオブジェクトからデータ取得
+        password = form.password.data
+        confirm_password = form.confirm_password.data
 
         existing_user = User.query.filter_by(username=username).first()
         if existing_user:
@@ -63,12 +58,18 @@ def register():
             flash('全てのフィールドを入力してください')
             return redirect(url_for('register'))
             
-        new_user = User(username=username)
-        new_user.set_password(password)
-        db.session.add(new_user)
-        db.session.commit()
-        flash('登録が成功しました！ログインしてください。')
-        return redirect(url_for('dashboard'))
+        try:
+            new_user = User(username=username)
+            new_user.set_password(password)
+            db.session.add(new_user)
+            db.session.commit()
+            flash('登録が成功しました！ログインしてください。')
+            return redirect(url_for('dashboard'))
+        except Exception as e:
+            db.session.rollback()
+            flash('データベースエラーが発生しました。')
+            print(f"Error: {e}")
+            return redirect(url_for('register'))
         
     else:
         if request.method == 'POST':
@@ -90,7 +91,6 @@ def login():
         return redirect(url_for('dashboard'))
 
     return render_template('login.html')
-
 
 @app.route('/logout')
 @login_required
@@ -168,4 +168,4 @@ if __name__ == '__main__':
     with app.app_context():
         db.create_all()
     port = int(os.getenv("PORT", 8080))
-    app.run(host="0.0.0.0", port=port,debug=True)
+    app.run(host="0.0.0.0", port=port, debug=True)
