@@ -208,8 +208,7 @@ def add_task():
 
     return render_template('add_task.html', form=form)
 
-# ダッシュボードルート
-@app.route('/dashboard', methods=['GET'])
+@app.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 def dashboard():
     conn = get_db_connection()
@@ -218,7 +217,22 @@ def dashboard():
     income_expense = conn.execute('SELECT * FROM income_expense WHERE user_id = ?', (current_user.id,)).fetchone()
     conn.close()
 
-    return render_template('dashboard.html', tasks=tasks, debt_types=debt_types, income_expense=income_expense)
+    # フォームオブジェクトの作成
+    task_form = TaskForm()
+    income_form = IncomeForm()
+    expense_form = ExpenseForm()
+    debt_form = DebtTypeForm()
+
+    # フォームをテンプレートに渡す
+    return render_template('dashboard.html', 
+                           tasks=tasks, 
+                           debt_types=debt_types, 
+                           income_expense=income_expense,
+                           task_form=task_form,
+                           income_form=income_form,
+                           expense_form=expense_form,
+                           debt_form=debt_form)
+
 
 # タスク完了ルート
 @app.route('/complete_task/<int:task_id>')
