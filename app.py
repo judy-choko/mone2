@@ -23,7 +23,8 @@ load_dotenv()
 SECRET_KEY = os.getenv("SECRET_KEY")
 # プッシュ
 # Japanese font
-rcParams['font.family'] = 'Noto Sans CJK JP'
+jp_font = fm.FontProperties(fname='/usr/share/fonts/NotoSansCJKjp/NotoSansCJKjp-Regular.otf: Noto Sans CJK JP,Noto Sans CJK JP Regular:style=Regular')
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = SECRET_KEY
@@ -477,7 +478,12 @@ def expense_category_chart():
     values = [expense['total_amount'] for expense in expenses]
     try:
         fig, ax = plt.subplots()
-        ax.pie(values, labels=labels, autopct='%1.1f%%', startangle=90)
+        ax.pie(values, labels=labels, autopct='%1.1f%%', startangle=90, fontproperties=jp_font)
+        ax.axis('equal')
+        img = io.BytesIO()
+        plt.savefig(img, format='png')
+        img.seek(0)
+        return Response(img.getvalue(), mimetype='image/png')
     except Exception as e:
         print(f"Error generating chart: {e}")
         flash('グラフ生成中にエラーが発生しました')
