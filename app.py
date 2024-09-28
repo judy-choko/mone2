@@ -21,7 +21,7 @@ load_dotenv()
 SECRET_KEY = os.getenv("SECRET_KEY")
 
 # Japanese font
-jp_font = fm.FontProperties(fname='/usr/share/fonts/truetype/noto/NotoSansCJK-Regular.ttc')
+jp_font = fm.FontProperties(fname='/usr/share/fonts/ipa/IPAexMincho.ttf')
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = SECRET_KEY
