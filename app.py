@@ -220,7 +220,7 @@ def calculate_fixed_expenses(conn, user_id):
         FROM expense
         JOIN expense_category ON expense.category_id = expense_category.id
         WHERE expense_category.parent_category = '固定費'
-        AND expense.user_id = ?
+        AND expense.user_id = %s 
     ''', (user_id,)).fetchone()
     return fixed_expenses['total_fixed_expenses'] if fixed_expenses['total_fixed_expenses'] is not None else 0
 
@@ -230,7 +230,7 @@ def calculate_total_payment(conn, user_id):
         SELECT SUM(debt_type.monthly_payment) AS total_payment
         FROM payment_task
         JOIN debt_type ON payment_task.debt_type_id = debt_type.id
-        WHERE payment_task.user_id = ?
+        WHERE payment_task.user_id = %s 
         AND strftime('%Y-%m', payment_task.due_date) = strftime('%Y-%m', 'now')
     ''', (user_id,)).fetchone()
     return total_payment['total_payment'] if total_payment['total_payment'] is not None else 0
@@ -240,7 +240,7 @@ def calculate_total_expenses(conn, user_id):
     other_expenses = conn.execute('''
         SELECT SUM(amount) AS total_expenses
         FROM expense
-        WHERE user_id = ?
+        WHERE user_id = %s 
     ''', (user_id,)).fetchone()
     return other_expenses['total_expenses'] if other_expenses['total_expenses'] is not None else 0
 
@@ -264,7 +264,7 @@ def create_monthly_tasks():
     users = cur.execute('SELECT id FROM app_user').fetchall()
 
     for user in users:
-        debt_types = conn.execute('SELECT * FROM debt_type WHERE user_id = ?', (user['id'],)).fetchall()
+        debt_types = conn.execute('SELECT * FROM debt_type WHERE user_id = %s ', (user['id'],)).fetchall()
         for debt in debt_types:
             conn.execute('INSERT INTO payment_task (user_id, debt_name, debt_type_id, monthly_payment, due_date, is_completed) VALUES (?, ?, ?, ?, ?, ?)', 
              (user['id'], debt['debt_name'], debt['id'], debt['monthly_payment'], datetime.today().replace(day=1), False))
@@ -283,13 +283,13 @@ def reset_monthly_income(user_id):
     cur = conn.cursor()
     today = datetime.today()
     # ユーザーのリセット日を取得
-    income_expense = cur.execute('SELECT income, expense, remaining_balance, reset_day FROM income_expense WHERE user_id = ?', (user_id,)).fetchone()
+    income_expense = cur.execute('SELECT income, expense, remaining_balance, reset_day FROM income_expense WHERE user_id = %s ', (user_id,)).fetchone()
 
     if income_expense:
         reset_day = income_expense['reset_day']
         if today.day == reset_day:
             remaining_balance = income_expense['income'] - income_expense['expense']
-            conn.execute('UPDATE income_expense SET remaining_balance = ?, income = 0, expense = 0 WHERE user_id = ?',
+            conn.execute('UPDATE income_expense SET remaining_balance = %s , income = 0, expense = 0 WHERE user_id = %s ',
                          (remaining_balance, user_id))
             conn.commit()
     
@@ -311,7 +311,7 @@ scheduler.start()
 def load_user(user_id):
     conn =  create_server_connection()
     cur = conn.cursor()
-    user = cur.execute('SELECT * FROM app_user WHERE id = ?', (user_id,)).fetchone()
+    user = cur.execute('SELECT * FROM app_user WHERE id = %s ', (user_id,)).fetchone()
     conn.close()
     if user:
         return User(user['id'], user['username'], user['password_hash'])
@@ -339,7 +339,7 @@ def register():
 
         conn =  create_server_connection()
         cur = conn.cursor()
-        existing_user = cur.execute('SELECT * FROM app_user WHERE username = ?', (username,)).fetchone()
+        existing_user = cur.execute('SELECT * FROM app_user WHERE username = %s ', (username,)).fetchone()
         if existing_user:
             flash('そのユーザー名は既に使用されています。')
             return redirect(url_for('register'))
@@ -363,7 +363,7 @@ def login():
         # SQLiteでユーザー情報を取得
         conn =  create_server_connection()
         cur = conn.cursor()
-        user = cur.execute('SELECT * FROM app_user WHERE username = ?', (username,)).fetchone()
+        user = cur.execute('SELECT * FROM app_user WHERE username = %s ', (username,)).fetchone()
         conn.close()
         if user and check_password_hash(user['password_hash'], password):
             user_obj = User(user['id'], user['username'], user['password_hash'])
@@ -391,7 +391,7 @@ def add_task():
     # 借金の種類を取得して選択肢に設定
     conn =  create_server_connection()
     cur = conn.cursor()
-    debt_types = cur.execute('SELECT id, debt_name FROM debt_type WHERE user_id = ?', (current_user.id,)).fetchall()
+    debt_types = cur.execute('SELECT id, debt_name FROM debt_type WHERE user_id = %s ', (current_user.id,)).fetchall()
     form.debt_type_id.choices = [(debt['id'], debt['debt_name']) for debt in debt_types]
     
     if form.validate_on_submit():
@@ -414,7 +414,7 @@ def add_task():
 def complete_task(task_id):
     conn =  create_server_connection()
     cur = conn.cursor()
-    cur.execute('UPDATE payment_task SET is_completed = 1 WHERE id = %s AND user_id = ?', (task_id, current_user.id))
+    cur.execute('UPDATE payment_task SET is_completed = 1 WHERE id = %s AND user_id = %s ', (task_id, current_user.id))
     conn.commit()
     conn.close()
 
@@ -429,7 +429,7 @@ def set_reset_day():
         reset_day = form.reset_day.data
         conn =  create_server_connection()
         cur = conn.cursor()
-        cur.execute('UPDATE income_expense SET reset_day = %s WHERE user_id = ?', (reset_day, current_user.id))
+        cur.execute('UPDATE income_expense SET reset_day = %s WHERE user_id = %s ', (reset_day, current_user.id))
         conn.commit()
         conn.close()
         flash('リセット日が更新されました。')
@@ -442,9 +442,9 @@ def dashboard():
     conn = create_server_connection()
     cur = conn.cursor()
     # 支出の合計を取得
-    total_expense = cur.execute('SELECT SUM(amount) FROM expense WHERE user_id = ?', (current_user.id,)).fetchone()
+    total_expense = cur.execute('SELECT SUM(amount) FROM expense WHERE user_id = %s ', (current_user.id,)).fetchone()
     total_expenses = total_expense[0] if total_expense[0] is not None else 0
-    tasks = conn.execute('SELECT id, debt_type_id,debt_name,monthly_payment, is_completed FROM payment_task WHERE user_id = ?', (current_user.id,)).fetchall()
+    tasks = conn.execute('SELECT id, debt_type_id,debt_name,monthly_payment, is_completed FROM payment_task WHERE user_id = %s ', (current_user.id,)).fetchall()
     # 各taskを辞書に変換してから処理
     
     task_list = []
@@ -452,11 +452,11 @@ def dashboard():
         task_dict = dict(task)  # Rowオブジェクトを辞書に変換
         task_list.append(task_dict)
     print(task_list)
-    debt_types = conn.execute('SELECT * FROM debt_type WHERE user_id = ?', (current_user.id,)).fetchall()
-    income_expense = conn.execute('SELECT * FROM income_expense WHERE user_id = ?', (current_user.id,)).fetchone()
+    debt_types = conn.execute('SELECT * FROM debt_type WHERE user_id = %s ', (current_user.id,)).fetchall()
+    income_expense = conn.execute('SELECT * FROM income_expense WHERE user_id = %s ', (current_user.id,)).fetchone()
     income_form = IncomeForm()    
     # ユーザーの収入を取得
-    income_row = conn.execute('SELECT income FROM income_expense WHERE user_id = ?', (current_user.id,)).fetchone()
+    income_row = conn.execute('SELECT income FROM income_expense WHERE user_id = %s ', (current_user.id,)).fetchone()
     income = income_row['income'] if income_row else 0
 
     # 固定費合計
@@ -504,7 +504,7 @@ def expense_category_chart():
         SELECT expense_category.name, SUM(expense.amount) as total_amount 
         FROM expense
         JOIN expense_category ON expense.category_id = expense_category.id
-        WHERE expense.user_id = ?
+        WHERE expense.user_id = %s 
         GROUP BY expense.category_id
     ''', (current_user.id,)).fetchall()
     conn.close()
@@ -556,8 +556,8 @@ def add_expense():
     # カテゴリのリストをデータベースから取得
     conn = create_server_connection()
     cur = conn.cursor()
-    fixed_categories = cur.execute('SELECT * FROM expense_category WHERE parent_category = %s AND user_id = ?', ('固定費', current_user.id)).fetchall()
-    variable_categories = cur.execute('SELECT * FROM expense_category WHERE parent_category = %s AND user_id = ?', ('変動費', current_user.id)).fetchall()
+    fixed_categories = cur.execute('SELECT * FROM expense_category WHERE parent_category = %s AND user_id = %s ', ('固定費', current_user.id)).fetchall()
+    variable_categories = cur.execute('SELECT * FROM expense_category WHERE parent_category = %s AND user_id = %s ', ('変動費', current_user.id)).fetchall()
 
     # カテゴリ選択フィールドにデータを追加
     form.category_id.choices = [(category['id'], category['name']) for category in fixed_categories + variable_categories]
@@ -591,11 +591,11 @@ def add_income():
         conn = get_db_connection()
         cur = conn.cursor()
         # 既存の収入/支出データがあるか確認
-        income_expense = cur.execute('SELECT * FROM income_expense WHERE user_id = ?', (current_user.id,)).fetchone()
+        income_expense = cur.execute('SELECT * FROM income_expense WHERE user_id = %s ', (current_user.id,)).fetchone()
 
         if income_expense:
             # 既存データがあれば更新
-            conn.execute('UPDATE income_expense SET income = income + ? WHERE user_id = ?', (income, current_user.id))
+            conn.execute('UPDATE income_expense SET income = income + ? WHERE user_id = %s ', (income, current_user.id))
         else:
             # 新規にデータを作成
             conn.execute('INSERT INTO income_expense (user_id, income, expense) VALUES (?, ?, 0)', (current_user.id, income))
