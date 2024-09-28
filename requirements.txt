@@ -6,3 +6,4 @@ Flask-Login
 matplotlib==3.4.2
 Werkzeug
 gunicorn
+wtforms
