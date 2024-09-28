@@ -57,16 +57,17 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        user = User.query.filter_by(username=username).first()
-
+        user = User.query.filter_by(username=username).first()  # ここにクエリを記述
+        
         if user is None or not user.check_password(password):
             flash('ユーザー名かパスワードが間違っています。')
             return redirect(url_for('login'))
-
+        
         login_user(user)
         return redirect(url_for('dashboard'))
 
     return render_template('login.html')
+
 
 @app.route('/logout')
 @login_required
