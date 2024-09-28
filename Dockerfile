@@ -5,15 +5,15 @@ FROM python:3.9-slim
 WORKDIR /app
 
 
-RUN apk add --no-cache curl fontconfig &&\
-　　curl -O https://moji.or.jp/wp-content/ipafont/IPAexfont/IPAexfont00301.zip && \
-　　mkdir -p /usr/share/fonts/ipa && \
-　　mkdir -p /temp && \
-　　unzip IPAexfont00301.zip -d /temp && \
-　　cp /temp/IPAexfont00301/*.ttf /usr/share/fonts/ipa/ && \
-　　rm IPAexfont00301.zip
-RUN rm -rf /temp && \
-　　fc-cache -fv
+# 必要なパッケージをインストールし、pipをアップグレード
+RUN apt-get update && apt-get install -y \
+    fonts-noto-cjk \
+    libfreetype6-dev \
+    libpng-dev \
+    libjpeg-dev \
+    fontconfig \
+    && rm -rf /var/lib/apt/lists/*
+
  
 # インストールされたフォントを確認
 RUN fc-cache -fv
