@@ -7,7 +7,7 @@ from models import db, User, DebtType, PaymentTask, ExpenseCategory, Expense, In
 from datetime import datetime
 import io
 import matplotlib.pyplot as plt
-
+from werkzeug.security import generate_password_hash
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -57,7 +57,8 @@ def register():
             return redirect(url_for('register'))
             
         new_user = User(username=username)
-        new_user.set_password(password)
+        password_hash = generate_password_hash(password)
+        new_user.set_password(password_hash)
         db.session.add(new_user)
         db.session.commit()
 
