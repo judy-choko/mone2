@@ -8,7 +8,7 @@
 </head>
 <body>
     <h1>ユーザー登録</h1>
-    <form method="POST" action="{{ url_for('register') }}">
+    <form method="POST">
     {{ form.hidden_tag() }}  <!-- CSRFトークン -->
         <label for="username">ユーザー名:</label>
         <input type="text" name="username" required><br>
