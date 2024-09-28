@@ -22,8 +22,8 @@ RUN wget https://moji.or.jp/wp-content/ipafont/IPAexfont/IPAexfont00301.zip && \
     cp IPAexfont00301/*.ttf /usr/share/fonts/ipa/ && \
 
 # フォントキャッシュを更新するためのコマンド実行
-RUN apt-get install -y fontconfig && \
-    fc-cache -fv
+# RUN apt-get install -y fontconfig && \
+#     fc-cache -fv
 
 
 # 環境変数からパスワードを設定する
