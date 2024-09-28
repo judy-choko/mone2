@@ -130,8 +130,8 @@ def login():
             return redirect(url_for('dashboard'))
         else:
             flash('ユーザー名かパスワードが間違っています。')
-
-    return render_template('login.html')
+    if request.method == 'GET':
+        return render_template('login.html')
 
 @app.route('/logout')
 @login_required
