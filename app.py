@@ -382,7 +382,7 @@ def login():
         user = cur.fetchone()
         conn.close()
         if user and check_password_hash(user['password_hash'], password):
-            user_obj = User(user['id'], user['username'], user['password_hash'])
+            user_obj = app_user(user['id'], user['username'], user['password_hash'])
             login_user(user_obj)
             return redirect(url_for('dashboard'))
         #if user and check_password_hash(user.password_hash, form.password.data):
