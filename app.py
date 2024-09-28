@@ -87,6 +87,17 @@ def init_db():
     ''')
     conn.commit()
     cur.execute('''
+        CREATE TABLE IF NOT EXISTS debt_type (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER NOT NULL,
+        debt_name TEXT NOT NULL,
+        total_debt INTEGER NOT NULL,
+        monthly_payment INTEGER NOT NULL,
+        FOREIGN KEY(user_id) REFERENCES app_user(id)
+        )
+    ''')
+    conn.commit()
+    cur.execute('''
         CREATE TABLE IF NOT EXISTS expense (
             id SERIAL PRIMARY KEY,
             user_id INTEGER NOT NULL,
@@ -111,17 +122,6 @@ CREATE TABLE IF NOT EXISTS payment_task (
     FOREIGN KEY(user_id) REFERENCES app_user(id),
     FOREIGN KEY(debt_type_id) REFERENCES debt_type(id)
     );
-    ''')
-    conn.commit()
-    cur.execute('''
-        CREATE TABLE IF NOT EXISTS debt_type (
-        id SERIAL PRIMARY KEY,
-        user_id INTEGER NOT NULL,
-        debt_name TEXT NOT NULL,
-        total_debt INTEGER NOT NULL,
-        monthly_payment INTEGER NOT NULL,
-        FOREIGN KEY(user_id) REFERENCES app_user(id)
-        )
     ''')
     conn.commit()
     cur.execute('''
