@@ -317,6 +317,7 @@ def load_user(user_id):
     
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    conn =  create_server_connection()
     if current_user.is_authenticated:
         return redirect(url_for('dashboard'))
     return render_template('index.html')
