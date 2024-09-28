@@ -4,6 +4,9 @@ from models import db, User, DebtType, PaymentTask, ExpenseCategory, Expense, In
 from datetime import datetime
 import io
 import matplotlib.pyplot as plt
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
