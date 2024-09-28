@@ -10,6 +10,11 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['PREFERRED_URL_SCHEME'] = 'https'
 app.config['SECRET_KEY'] = 'your_secret_key'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
+
+
+db = SQLAlchemy(app)
+migrate = Migrate(app, db)  # Flask-Migrateの初期化
+
 db.init_app(app)
 
 login_manager = LoginManager()
