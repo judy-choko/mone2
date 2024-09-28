@@ -3,7 +3,6 @@ Flask-Migrate
 Flask-WTF
 Flask
 Flask-Login
-Flask-WTF
 matplotlib==3.4.2
 Werkzeug
 gunicorn
