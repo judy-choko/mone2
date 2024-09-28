@@ -107,7 +107,7 @@ CREATE TABLE IF NOT EXISTS payment_task (
     debt_name TEXT NOT NULL,
     monthly_payment INTEGER NOT NULL,                
     due_date TIMESTAMP NOT NULL,  -- TIMESTAMP to store both date and time
-    is_completed BOOLEAN NOT NULL DEFAULT 0,
+    is_completed BOOLEAN NOT NULL DEFAULT False,  -- ここを整数からbooleanに変更
     FOREIGN KEY(user_id) REFERENCES app_user(id),
     FOREIGN KEY(debt_type_id) REFERENCES debt_type(id)
     );
