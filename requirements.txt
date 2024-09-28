@@ -7,3 +7,4 @@ matplotlib>=3.4,<3.5
 gunicorn
 numpy==1.21.0
 Flask-Migrate>=3.0.0
+Flask-WTF
