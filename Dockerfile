@@ -24,10 +24,15 @@ USER chokokaruros
 # 必要なパッケージをインストール
 RUN pip install --no-cache-dir -r requirements.txt
 
+# データベースのマイグレーションとアップグレードを実行
+RUN flask db migrate || true  # 既存のマイグレーションがない場合でもエラーを無視
+RUN flask db upgrade
+
 # 環境変数の設定
 ENV FLASK_APP=app.py
 ENV FLASK_ENV=production
 ENV PATH="/home/chokokaruros/.local/bin:$PATH"
+
 
 # ポート5000をコンテナ外部に公開
 EXPOSE 8080
