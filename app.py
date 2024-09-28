@@ -38,9 +38,10 @@ def index():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        confirm_password = request.form['confirm_password']
+        username = request.form.get('username')  # フォームからのデータ取得
+        password = request.form.get('password')
+        confirm_password = request.form.get('confirm_password')
+        print(username,password,confirm_password)
 
         existing_user = User.query.filter_by(username=username).first()
         if existing_user:
@@ -50,7 +51,11 @@ def register():
         if password != confirm_password:
             flash('パスワードが一致しません。')
             return redirect(url_for('register'))
-
+            
+        if not username or not password:
+            flash('全てのフィールドを入力してください')
+            return redirect(url_for('register'))
+            
         new_user = User(username=username)
         new_user.set_password(password)
         db.session.add(new_user)
