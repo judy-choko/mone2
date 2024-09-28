@@ -18,12 +18,21 @@
         {% endif %}
     {% endwith %}
     <h1>{{ current_user.username }}のダッシュボード</h1>
-
+    <div class="card">
+    <h2>ステータス</h2>
+    <p>1日の支出可能額：{{ daily_allowance }}円、前月の繰り越し額：{{ income_expense.remaining_balance }}円</p>
+    </div>
+    <div class="card">
+    <h2>支出カテゴリごとのグラフ</h2>
+    <img src="{{ url_for('expense_category_chart') }}" alt="支出カテゴリ円グラフ">
+</div>
+    <div class="card">
     <h2>借金返済タスク</h2>
     <ul>
         {% for task in tasks %}
             <li>
-                {{ task.due_date.strftime('%Y-%m-%d') }} - {{ task.debt_type.name }}
+                {{ task.debt_name }}
+                {{ task.monthly_payment }}
                 {% if task.is_completed %}
                     <strong>完了</strong>
                 {% else %}
@@ -31,55 +40,38 @@
                 {% endif %}
             </li>
         {% endfor %}
+        <h2>今月の返済額合計</h2>
+        <p>{{ month_total_payment }}</p>
     </ul>
-
-    <!-- タスク追加フォーム -->
-    <h3>タスクを登録</h3>
-    <form method="POST" action="{{ url_for('add_task') }}">
-        {{ form.hidden_tag() }}  <!-- CSRFトークン -->
-        <label for="debt_type">借金の種類:</label>
-        <select name="debt_type_id" required>
-            {% for debt in debt_types %}
-                <option value="{{ debt.id }}">{{ debt.name }}</option>
-            {% endfor %}
-        </select><br>
-
-        <label for="due_date">期日:</label>
-        <input type="date" name="due_date" required><br>
-
-        <button type="submit">タスクを追加</button>
-    </form>
-
+</div>
+    <div class="card">
     <h2>今月の収支</h2>
     <p>収入: {{ income_expense.income if income_expense else 0 }}円</p>
-    <p>支出: {{ income_expense.expense if income_expense else 0 }}円</p>
-
+    <p>支出: {{ total_expense }}円</p> 
+    <div class="card">
     <h3>収入を登録</h3>
     <form method="POST" action="{{ url_for('add_income') }}">
-        {{ form.hidden_tag() }}  <!-- CSRFトークン -->
+        {{ income_form.hidden_tag() }}  <!-- CSRFトークン -->
         <label for="income">収入額:</label>
         <input type="number" name="income" required>
         <button type="submit">追加</button>
     </form>
-
+</div>
+    <div class="card">
     <h3>支出を登録</h3>
-    <form method="POST" action="{{ url_for('add_expense') }}">
-        {{ form.hidden_tag() }}  <!-- CSRFトークン -->
-        <label for="expense">支出額:</label>
-        <input type="number" name="expense" required>
-        <button type="submit">追加</button>
-    </form>
-
+    <p><a href="{{ url_for('add_expense') }}">支出を追加する</a></p>
+    <div class="card">
     <h2>借金の種類</h2>
     <ul>
         {% for debt in debt_types %}
-            <li>{{ debt.name }}: 借金総額 {{ debt.total_debt }}円, 月々の返済額 {{ debt.monthly_payment }}円</li>
+            <li>{{ debt.debt_name }}: 借金総額 {{ debt.total_debt }}円, 月々の返済額 {{ debt.monthly_payment }}円</li>
         {% endfor %}
     </ul>
-
+</div>
+    <div class="card">
     <h3>借金の種類を登録</h3>
     <form method="POST" action="{{ url_for('add_debt_type') }}">
-        {{ form.hidden_tag() }}  <!-- CSRFトークン -->
+        {{ debt_form.hidden_tag() }}  <!-- CSRFトークン -->
         <label for="debt_name">借金の名前:</label>
         <input type="text" name="debt_name" required>
         <label for="total_debt">借金総額:</label>
@@ -88,7 +80,32 @@
         <input type="number" name="monthly_payment" required>
         <button type="submit">追加</button>
     </form>
+</div>
+    <div class="card">
+    <h2>支出カテゴリ</h2>
+    <h3>カテゴリを追加</h3>
+    <form method="POST" action="{{ url_for('add_category') }}">
+        {{ category_form.hidden_tag() }}  <!-- CSRFトークン -->
+        <label for="category_name">カテゴリ名:</label>
+        <input type="text" name="category_name" required><br>
 
+        <label for="parent_category">大カテゴリ:</label>
+        <select name="parent_category" required>
+            <option value="固定費">固定費</option>
+            <option value="変動費">変動費</option>
+        </select><br>
+
+        <button type="submit">カテゴリを追加</button>
+    </form>
+</div>
+<div class="card">
+    <form method="POST" action="{{ url_for('set_reset_day') }}">
+        {{ reset_form.hidden_tag() }}
+        <label for="reset_day">リセット日:</label>
+        {{ reset_form.reset_day }}
+        <button type="submit">リセット日を設定</button>
+    </form>
+</div>
     <a href="{{ url_for('logout') }}">ログアウト</a>
 </body>
 </html>
