@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 from werkzeug.security import generate_password_hash
 from flask_wtf.csrf import CSRFProtect
 import os
+from forms import RegistrationForm
 
 app = Flask(__name__)
 
@@ -42,6 +43,14 @@ def index():
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+     form = RegistrationForm()
+    if form.validate_on_submit():
+        new_user = User(username=username)
+        password_hash = generate_password_hash(password)
+        new_user.set_password(password_hash)
+        db.session.add(new_user)
+        db.session.commit()
+        return redirect(url_for('dashboard'))
     if request.method == 'POST':
         username = request.form.get('username')  # フォームからのデータ取得
         password = request.form.get('password')
@@ -61,11 +70,7 @@ def register():
             flash('全てのフィールドを入力してください')
             return redirect(url_for('register'))
             
-        new_user = User(username=username)
-        password_hash = generate_password_hash(password)
-        new_user.set_password(password_hash)
-        db.session.add(new_user)
-        db.session.commit()
+
 
         flash('登録が成功しました！ログインしてください。')
         return redirect(url_for('login'))
