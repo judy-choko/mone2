@@ -7,6 +7,16 @@
     <title>ダッシュボード</title>
 </head>
 <body>
+        <!-- フラッシュメッセージの表示 -->
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul class="flashes">
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
     <h1>{{ current_user.username }}のダッシュボード</h1>
 
     <h2>支出カテゴリごとのグラフ</h2>
