@@ -9,12 +9,12 @@
 <body>
     <h1>ログイン</h1>
     <form method="POST">
-        {{ form.hidden_tag() }}  <!-- CSRFトークン -->
+    {{ form.hidden_tag() }}  <!-- CSRFトークン -->
         <label for="username">ユーザー名:</label>
-        <input type="text" name="username" required><br>
-
+    {{ form.username }}
+    
         <label for="password">パスワード:</label>
-        <input type="password" name="password" required><br>
+    {{ form.password }}
 
         <button type="submit">ログイン</button>
     </form>
