@@ -39,4 +39,4 @@ RUN python -c 'from app import init_db; init_db()'
 EXPOSE 8080
 
 # Flaskアプリケーションを起動
-CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:8080", "app:app"]
+CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:8080","--log-level", "debug", "app:app"]
