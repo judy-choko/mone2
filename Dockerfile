@@ -33,4 +33,4 @@ ENV PATH="/home/chokokaruros/.local/bin:$PATH"
 EXPOSE 8080
 
 # Flaskアプリケーションを起動
-ENTRYPOINT ["flask", "run", "--host=0.0.0.0"]
+CMD ["gunicorn", "-b", "0.0.0.0:8080", "app:app"]
