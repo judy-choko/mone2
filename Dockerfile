@@ -27,9 +27,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 # 環境変数の設定
 ENV FLASK_APP=app.py
 ENV FLASK_ENV=production
+ENV PATH="/home/chokokaruros/.local/bin:$PATH"
 
 # ポート5000をコンテナ外部に公開
 EXPOSE 5000
 
 # Flaskアプリケーションを起動
-CMD ["flask", "run", "--host=0.0.0.0"]
+ENTRYPOINT ["flask", "run", "--host=0.0.0.0"]
