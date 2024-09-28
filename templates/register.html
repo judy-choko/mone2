@@ -21,16 +21,16 @@
     <h1>ユーザー登録</h1>
     <form method="POST">
     {{ form.hidden_tag() }}  <!-- CSRFトークン -->
-        <label for="username">ユーザー名:</label>
+        <p><label for="username">ユーザー名:</label></p>
     {{ form.username }}
     
-        <label for="password">パスワード:</label>
+        <p><label for="password">パスワード:</label></p>
     {{ form.password }}
         
-        <label for="confirm_password">パスワード確認:</label>
+       <p> <label for="confirm_password">パスワード確認:</label></p>
     {{ form.confirm_password }}     
         
-    <button type="submit">登録する</button>
+    <p><button type="submit">登録する</button></p>
 </form>
 </div>
     <p>既にアカウントをお持ちですか？ <a href="{{ url_for('login') }}">ログイン</a></p>
