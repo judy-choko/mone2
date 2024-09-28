@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>ダッシュボード</title>
+</head>
+<body>
+    <h1>{{ current_user.username }}のダッシュボード</h1>
+
+    <h2>支出カテゴリごとのグラフ</h2>
+    <img src="{{ url_for('expense_category_chart') }}" alt="支出カテゴリ円グラフ">
+
+    <h2>今月の収支</h2>
+    <p>収入: {{ income_expense.income if income_expense else 0 }}円</p>
+    <p>支出: {{ income_expense.expense if income_expense else 0 }}円</p>
+
+    <a href="/logout">ログアウト</a>
+</body>
+</html>
