@@ -74,7 +74,7 @@ def register():
     else:
         if request.method == 'POST':
             flash('フォームの送信に失敗しました。もう一度お試しください。')
-            return render_template('register.html', form=form)
+    return render_template('register.html', form=form)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
