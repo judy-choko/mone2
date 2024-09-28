@@ -19,7 +19,7 @@ import calendar
 load_dotenv()
 
 SECRET_KEY = os.getenv("SECRET_KEY")
-
+# プッシュ
 # Japanese font
 jp_font = fm.FontProperties(fname='/usr/share/fonts/ipa/IPAexMincho.ttf')
 
