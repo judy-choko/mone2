@@ -9,9 +9,6 @@ WORKDIR /app
 RUN apt-get update && \
     apt-get install -y wget \
     fontconfig \  # ここでfontconfigをインストール
-    libfreetype6-dev \
-    libpng-dev \
-    libjpeg-dev \
     unzip \
     && rm -rf /var/lib/apt/lists/*
 
