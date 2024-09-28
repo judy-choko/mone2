@@ -233,11 +233,12 @@ def calculate_total_payment(cur, user_id):
         SELECT SUM(debt_type.monthly_payment) AS total_payment
         FROM payment_task
         JOIN debt_type ON payment_task.debt_type_id = debt_type.id
-        WHERE payment_task.user_id = %s 
-        AND strftime('%Y-%m', payment_task.due_date) = strftime('%Y-%m', 'now')
+        WHERE payment_task.user_id = %s
+        AND TO_CHAR(payment_task.due_date, 'YYYY-MM') = TO_CHAR(NOW(), 'YYYY-MM')
     ''', (user_id,))
     total_payment = cur.fetchone()
     return total_payment['total_payment'] if total_payment['total_payment'] is not None else 0
+
 
 # その他の支出合計計算
 def calculate_total_expenses(cur, user_id):
