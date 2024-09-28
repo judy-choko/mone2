@@ -64,8 +64,7 @@ def register():
             return redirect(url_for('register'))
             
         new_user = User(username=username)
-        password_hash = generate_password_hash(password)
-        new_user.set_password(password_hash)
+        new_user.set_password(password)
         db.session.add(new_user)
         db.session.commit()
         flash('登録が成功しました！ログインしてください。')
