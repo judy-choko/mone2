@@ -68,7 +68,7 @@ def init_db():
     print("データベースを構築します")
     conn = create_server_connection()
     cur = conn.cursor()
-    conn.execute('''
+    cur.execute('''
         CREATE TABLE IF NOT EXISTS user (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT NOT NULL,
@@ -76,7 +76,7 @@ def init_db():
         )
     ''')
     conn.commit()
-    conn.execute('''
+    cur.execute('''
         CREATE TABLE IF NOT EXISTS expense_category (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
@@ -86,7 +86,7 @@ def init_db():
         )
     ''')
     conn.commit()
-    conn.execute('''
+    cur.execute('''
         CREATE TABLE IF NOT EXISTS expense (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NOT NULL,
@@ -99,7 +99,7 @@ def init_db():
         )
     ''')
     conn.commit()
-    conn.execute('''
+    cur.execute('''
 CREATE TABLE IF NOT EXISTS payment_task (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,
@@ -113,7 +113,7 @@ CREATE TABLE IF NOT EXISTS payment_task (
     );
     ''')
     conn.commit()
-    conn.execute('''
+    cur.execute('''
         CREATE TABLE IF NOT EXISTS debt_type (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id INTEGER NOT NULL,
@@ -124,7 +124,7 @@ CREATE TABLE IF NOT EXISTS payment_task (
         )
     ''')
     conn.commit()
-    conn.execute('''
+    cur.execute('''
         CREATE TABLE IF NOT EXISTS income_expense (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id INTEGER NOT NULL,
