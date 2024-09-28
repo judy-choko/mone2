@@ -20,33 +20,45 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
-# SQLiteのデータベース接続を取得する関数
-def get_db_connection():
-    conn = sqlite3.connect('app.db')
-    conn.row_factory = sqlite3.Row
-    return conn
-
-# 初期データベーステーブルを作成する
+# データベース初期化関数
 def init_db():
-    with get_db_connection() as conn:
-        conn.execute('''
+    conn = get_db_connection()
+    conn.execute('''
         CREATE TABLE IF NOT EXISTS user (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT UNIQUE NOT NULL,
+            username TEXT NOT NULL,
             password_hash TEXT NOT NULL
         )
-        ''')
-        conn.execute('''
+    ''')
+    conn.execute('''
+        CREATE TABLE IF NOT EXISTS expense_category (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            parent_category TEXT NOT NULL,
+            user_id INTEGER NOT NULL,
+            FOREIGN KEY (user_id) REFERENCES user(id)
+        )
+    ''')
+    conn.execute('''
         CREATE TABLE IF NOT EXISTS expense (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER,
-            amount INTEGER,
-            category_id INTEGER,
-            description TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            user_id INTEGER NOT NULL,
+            amount INTEGER NOT NULL,
+            category_id INTEGER NOT NULL,
+            description TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES user(id),
+            FOREIGN KEY (category_id) REFERENCES expense_category(id)
         )
-        ''')
-        conn.commit()
+    ''')
+    conn.commit()
+    conn.close()
+    
+# SQLiteデータベース接続関数
+def get_db_connection():
+    conn = sqlite3.connect('app.db')
+    conn.row_factory = sqlite3.Row  # クエリ結果を辞書形式で取得
+    return conn
 
 # ログインフォームの定義
 class LoginForm(FlaskForm):
@@ -54,7 +66,19 @@ class LoginForm(FlaskForm):
     password = PasswordField('パスワード', validators=[DataRequired()])
     submit = SubmitField('ログイン')
 
+# カテゴリ追加用フォーム
+class AddCategoryForm(FlaskForm):
+    category_name = StringField('カテゴリ名', validators=[DataRequired()])
+    parent_category = SelectField('大カテゴリ', choices=[('固定費', '固定費'), ('変動費', '変動費')], validators=[DataRequired()])
+    submit = SubmitField('カテゴリを追加')
 
+# 支出追加用フォーム
+class AddExpenseForm(FlaskForm):
+    amount = IntegerField('支出額', validators=[DataRequired()])
+    description = StringField('説明', validators=[DataRequired()])
+    category_id = SelectField('カテゴリ', coerce=int)
+    submit = SubmitField('支出を追加')
+    
 @login_manager.user_loader
 def load_user(user_id):
     conn = get_db_connection()
@@ -161,25 +185,6 @@ def dashboard():
 
     return render_template('dashboard.html', expenses=expenses)
 
-@app.route('/add_expense', methods=['GET', 'POST'])
-@login_required
-def add_expense():
-    if request.method == 'POST':
-        amount = request.form['amount']
-        description = request.form['description']
-        category_id = request.form['category_id']
-
-        conn = get_db_connection()
-        conn.execute('INSERT INTO expense (user_id, amount, category_id, description) VALUES (?, ?, ?, ?)', 
-                     (current_user.id, amount, category_id, description))
-        conn.commit()
-        conn.close()
-
-        flash('支出が登録されました。')
-        return redirect(url_for('dashboard'))
-
-    return render_template('add_expense.html')
-
 @app.route('/expense_category_chart')
 @login_required
 def expense_category_chart():
@@ -199,6 +204,59 @@ def expense_category_chart():
     plt.savefig(img, format='png')
     img.seek(0)
     return Response(img.getvalue(), mimetype='image/png')
+
+# カテゴリ追加ルート
+@app.route('/add_category', methods=['GET', 'POST'])
+@login_required
+def add_category():
+    form = AddCategoryForm()
+    if form.validate_on_submit():
+        category_name = form.category_name.data
+        parent_category = form.parent_category.data
+
+        # カテゴリをデータベースに追加
+        conn = get_db_connection()
+        conn.execute('INSERT INTO expense_category (name, parent_category, user_id) VALUES (?, ?, ?)', 
+                     (category_name, parent_category, current_user.id))
+        conn.commit()
+        conn.close()
+
+        flash('カテゴリが追加されました。')
+        return redirect(url_for('dashboard'))
+
+    return render_template('add_category.html', form=form)
+
+# 支出追加ルート
+@app.route('/add_expense', methods=['GET', 'POST'])
+@login_required
+def add_expense():
+    form = AddExpenseForm()
+
+    # カテゴリのリストをデータベースから取得
+    conn = get_db_connection()
+    fixed_categories = conn.execute('SELECT * FROM expense_category WHERE parent_category = ? AND user_id = ?', ('固定費', current_user.id)).fetchall()
+    variable_categories = conn.execute('SELECT * FROM expense_category WHERE parent_category = ? AND user_id = ?', ('変動費', current_user.id)).fetchall()
+
+    # カテゴリ選択フィールドにデータを追加
+    form.category_id.choices = [(category['id'], category['name']) for category in fixed_categories + variable_categories]
+
+    if form.validate_on_submit():
+        # フォームからデータを取得
+        amount = form.amount.data
+        description = form.description.data
+        category_id = form.category_id.data
+
+        # データベースに支出を追加
+        conn.execute('INSERT INTO expense (user_id, amount, category_id, description) VALUES (?, ?, ?, ?)', 
+                     (current_user.id, amount, category_id, description))
+        conn.commit()
+        conn.close()
+
+        flash('支出が追加されました。')
+        return redirect(url_for('dashboard'))
+
+    return render_template('add_expense.html', form=form, fixed_categories=fixed_categories, variable_categories=variable_categories)
+
 
 if __name__ == '__main__':
     with app.app_context():
