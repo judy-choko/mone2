@@ -433,7 +433,7 @@ def add_task():
 def complete_task(task_id):
     conn =  create_server_connection()
     cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-    cur.execute('UPDATE payment_task SET is_completed = 1 WHERE id = %s AND user_id = %s ', (task_id, current_user.id))
+    cur.execute('UPDATE payment_task SET is_completed = True WHERE id = %s AND user_id = %s ', (task_id, current_user.id))
     conn.commit()
     conn.close()
 
