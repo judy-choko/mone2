@@ -478,7 +478,7 @@ def expense_category_chart():
     values = [expense['total_amount'] for expense in expenses]
     print(labels,values)
     try:
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(figsize=(2, 2))  # 幅5インチ、高さ3インチの画像
         wedges, texts, autotexts = ax.pie(values, labels=labels, autopct='%1.1f%%', startangle=90)
         ax.axis('equal')
         img = io.BytesIO()
