@@ -328,7 +328,7 @@ def load_user(user_id):
     user = cur.fetchone()
     conn.close()
     if user:
-        return User(user['id'], user['username'], user['password_hash'])
+        return app_user(user['id'], user['username'], user['password_hash'])
     return None
 
     
