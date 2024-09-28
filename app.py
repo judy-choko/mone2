@@ -414,7 +414,7 @@ def add_task():
 def complete_task(task_id):
     conn =  create_server_connection()
     cur = conn.cursor()
-    cur.execute('UPDATE payment_task SET is_completed = 1 WHERE id = ? AND user_id = ?', (task_id, current_user.id))
+    cur.execute('UPDATE payment_task SET is_completed = 1 WHERE id = %s AND user_id = ?', (task_id, current_user.id))
     conn.commit()
     conn.close()
 
@@ -429,7 +429,7 @@ def set_reset_day():
         reset_day = form.reset_day.data
         conn =  create_server_connection()
         cur = conn.cursor()
-        cur.execute('UPDATE income_expense SET reset_day = ? WHERE user_id = ?', (reset_day, current_user.id))
+        cur.execute('UPDATE income_expense SET reset_day = %s WHERE user_id = ?', (reset_day, current_user.id))
         conn.commit()
         conn.close()
         flash('リセット日が更新されました。')
@@ -556,8 +556,8 @@ def add_expense():
     # カテゴリのリストをデータベースから取得
     conn = create_server_connection()
     cur = conn.cursor()
-    fixed_categories = cur.execute('SELECT * FROM expense_category WHERE parent_category = ? AND user_id = ?', ('固定費', current_user.id)).fetchall()
-    variable_categories = cur.execute('SELECT * FROM expense_category WHERE parent_category = ? AND user_id = ?', ('変動費', current_user.id)).fetchall()
+    fixed_categories = cur.execute('SELECT * FROM expense_category WHERE parent_category = %s AND user_id = ?', ('固定費', current_user.id)).fetchall()
+    variable_categories = cur.execute('SELECT * FROM expense_category WHERE parent_category = %s AND user_id = ?', ('変動費', current_user.id)).fetchall()
 
     # カテゴリ選択フィールドにデータを追加
     form.category_id.choices = [(category['id'], category['name']) for category in fixed_categories + variable_categories]
@@ -627,7 +627,7 @@ def add_debt_type():
         conn.commit()
 
         # 追加された借金のIDを取得
-        new_debt = conn.execute('SELECT id FROM debt_type WHERE user_id = ? ORDER BY id DESC LIMIT 1',
+        new_debt = conn.execute('SELECT id FROM debt_type WHERE user_id = %s ORDER BY id DESC LIMIT 1',
                                 (current_user.id,)).fetchone()
 
         # 初回のタスクを自動生成 (例えば、当月の1日に設定)
