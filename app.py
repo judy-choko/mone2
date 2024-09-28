@@ -67,7 +67,7 @@ sqlite3.register_converter("timestamp", convert_datetime)
 def init_db():
     print("データベースを構築します")
     conn = create_server_connection()
-    cur = conn.cursor()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
     cur.execute('''
         CREATE TABLE IF NOT EXISTS app_user (
             id SERIAL PRIMARY KEY,
@@ -263,7 +263,7 @@ def calculate_daily_allowance(income, total_payment, fixed_expenses, total_expen
 # Generate monthly payment tasks automatically
 def create_monthly_tasks():
     conn =  create_server_connection()
-    cur = conn.cursor()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
     cur.execute('SELECT id FROM app_user')
     users = cur.fetchall()
     conn.commit()
@@ -289,7 +289,7 @@ scheduler.start()
 
 def reset_monthly_income(user_id):
     conn =  create_server_connection()
-    cur = conn.cursor()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
     today = datetime.today()
     # ユーザーのリセット日を取得
     cur.execute('SELECT income, expense, remaining_balance, reset_day FROM income_expense WHERE user_id = %s ', (user_id,))
@@ -307,7 +307,7 @@ def reset_monthly_income(user_id):
 
 def check_and_reset_incomes():
     conn =  create_server_connection()
-    cur = conn.cursor()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
     cur.execute('SELECT user_id FROM income_expense')
     users = cur.fetchall()
     for user in users:
@@ -321,7 +321,7 @@ scheduler.start()
 @login_manager.user_loader
 def load_user(user_id):
     conn =  create_server_connection()
-    cur = conn.cursor()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
     cur.execute('SELECT * FROM app_user WHERE id = %s ', (user_id,))
     user = cur.fetchone()
     conn.close()
@@ -350,7 +350,7 @@ def register():
             return redirect(url_for('register'))
 
         conn =  create_server_connection()
-        cur = conn.cursor()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
         cur.execute('SELECT * FROM app_user WHERE username = %s ', (username,))
         existing_user = cur.fetchone()
         if existing_user:
@@ -375,7 +375,7 @@ def login():
         password = form.password.data
         # SQLiteでユーザー情報を取得
         conn =  create_server_connection()
-        cur = conn.cursor()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
         cur.execute('SELECT * FROM app_user WHERE username = %s ', (username,))
         user = cur.fetchone()
         conn.close()
@@ -404,7 +404,7 @@ def add_task():
 
     # 借金の種類を取得して選択肢に設定
     conn =  create_server_connection()
-    cur = conn.cursor()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
     cur.execute('SELECT id, debt_name FROM debt_type WHERE user_id = %s ', (current_user.id,))
     debt_types = cur.fetchall()
     form.debt_type_id.choices = [(debt['id'], debt['debt_name']) for debt in debt_types]
@@ -413,7 +413,7 @@ def add_task():
         # フォームからデータを取得し、タスクを登録
         debt_type_id = form.debt_type_id.data
         due_date = form.due_date.data
-        cur = conn.cursor()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
         cur.execute('INSERT INTO payment_task (user_id, debt_type_id,debt_name,monthly_payment, due_date, is_completed) VALUES (%s, %s, %s, %s)', 
                      (current_user.id, debt_type_id, due_date, False))
         conn.commit()
@@ -428,7 +428,7 @@ def add_task():
 @login_required
 def complete_task(task_id):
     conn =  create_server_connection()
-    cur = conn.cursor()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
     cur.execute('UPDATE payment_task SET is_completed = 1 WHERE id = %s AND user_id = %s ', (task_id, current_user.id))
     conn.commit()
     conn.close()
@@ -443,7 +443,7 @@ def set_reset_day():
     if form.validate_on_submit():
         reset_day = form.reset_day.data
         conn =  create_server_connection()
-        cur = conn.cursor()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
         cur.execute('UPDATE income_expense SET reset_day = %s WHERE user_id = %s ', (reset_day, current_user.id))
         conn.commit()
         conn.close()
@@ -455,7 +455,7 @@ def set_reset_day():
 @login_required
 def dashboard():
     conn = create_server_connection()
-    cur = conn.cursor()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
     # 支出の合計を取得
     cur.execute('SELECT SUM(amount) FROM expense WHERE user_id = %s ', (current_user.id,))
     total_expense = cur.fetchone()
@@ -524,7 +524,7 @@ def dashboard():
 @login_required
 def expense_category_chart():
     conn = create_server_connection()
-    cur = conn.cursor()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
     cur.execute('''
         SELECT expense_category.name, SUM(expense.amount) as total_amount 
         FROM expense
@@ -562,7 +562,7 @@ def add_category():
 
         # カテゴリをデータベースに追加
         conn = create_server_connection()
-        cur = conn.cursor()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
         cur.execute('INSERT INTO expense_category (name, parent_category, user_id) VALUES (%s, %s, %s)', 
                      (category_name, parent_category, current_user.id))
         conn.commit()
@@ -581,7 +581,7 @@ def add_expense():
 
     # カテゴリのリストをデータベースから取得
     conn = create_server_connection()
-    cur = conn.cursor()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
     cur.execute('SELECT * FROM expense_category WHERE parent_category = %s AND user_id = %s ', ('固定費', current_user.id))
     fixed_categories = cur.fetchall()
     conn.commit()
@@ -619,7 +619,7 @@ def add_income():
         
         # データベースに収入を追加
         conn = get_db_connection()
-        cur = conn.cursor()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
         # 既存の収入/支出データがあるか確認
         cur.execute('SELECT * FROM income_expense WHERE user_id = %s ', (current_user.id,))
         income_expense = cur.fetchone()
@@ -653,7 +653,7 @@ def add_debt_type():
 
         # データベースに借金の種類を追加
         conn = create_server_connection()
-        cur = conn.cursor()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
         cur.execute('INSERT INTO debt_type (debt_name, total_debt, monthly_payment, user_id) VALUES (%s, %s, %s, %s)',
                      (debt_name, total_debt, monthly_payment, current_user.id))
         conn.commit()
