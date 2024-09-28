@@ -33,7 +33,7 @@ ENV FLASK_APP=app.py
 ENV PATH="/home/chokokaruros/.local/bin:$PATH"
 
 # SQLiteデータベースの初期化（テーブル作成などを行うスクリプトを実行）
-# RUN python -c 'from app import init_db; init_db()'
+RUN python -c 'from app import init_db; init_db()'
 
 # ポート5000をコンテナ外部に公開
 EXPOSE 8080
