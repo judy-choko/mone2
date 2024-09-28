@@ -5,7 +5,7 @@ from datetime import datetime
 db = SQLAlchemy()
         
 class User(db.Model):
-    id = db.Column(db.String(255), primary_key=True, unique=True, nullable=False)
+    id = id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(150), unique=True, nullable=False)
     password_hash = db.Column(db.String(150), nullable=False)
 
