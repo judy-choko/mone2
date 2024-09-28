@@ -358,7 +358,7 @@ def register():
             return redirect(url_for('register'))
 
         hashed_password = generate_password_hash(password)
-        cur.execute('INSERT INTO user (username, password_hash) VALUES (?, ?)', (username, hashed_password))
+        cur.execute('INSERT INTO app_user (username, password_hash) VALUES (?, ?)', (username, hashed_password))
         conn.commit()
         conn.close()
 
