@@ -19,6 +19,7 @@
     {% endwith %}
     <h1>カテゴリを追加</h1>
     <form method="POST">
+        {{ form.hidden_tag() }}  <!-- CSRFトークン -->
         <label for="category_name">カテゴリ名:</label>
         <input type="text" name="category_name" required><br>
 
