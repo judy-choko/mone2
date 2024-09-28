@@ -9,14 +9,10 @@ WORKDIR /app
 RUN apt-get update && \
     apt-get install -y wget fontconfig zip unzip fonts-migmix
 # パッケージのインストールや他の設定
-RUN apt-get update && apt-get install -y \
-    locales \
-    && locale-gen ja_JP.UTF-8
-# IPAフォントをダウンロードしてインストール
-RUN wget https://moji.or.jp/wp-content/ipafont/IPAexfont/IPAexfont00301.zip && \
-    unzip IPAexfont00301.zip && \
-    mkdir -p /usr/share/fonts/ipa && \
-    cp IPAexfont00301/*.ttf /usr/share/fonts/ipa/
+RUN wget https://noto-website-2.storage.googleapis.com/pkgs/NotoSansCJKjp-hinted.zip
+RUN unzip NotoSansCJKjp-hinted.zip -d /usr/share/fonts/NotoSansCJKjp
+RUN chmod 644 /usr/share/fonts/NotoSansCJKjp
+RUN fc-cache -fv
 
 # 環境変数からパスワードを設定する
 ARG ROOTPASS
