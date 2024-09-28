@@ -7,6 +7,9 @@ WORKDIR /app
 # 必要なパッケージをインストールし、pipをアップグレード
 RUN apt-get update && apt-get install -y --no-install-recommends gcc sudo \
     && pip install --upgrade pip
+    fonts-noto-cjk \
+    libfreetype6-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 # 環境変数からパスワードを設定する
 ARG ROOTPASS
