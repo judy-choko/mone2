@@ -8,19 +8,22 @@
 </head>
 <body>
     <h1>ユーザー登録</h1>
-    <form method="POST">
-        {{ form.hidden_tag() }}  <!-- CSRFトークン -->
+    <form method="POST" action="{{ url_for('register') }}">
+    {{ form.hidden_tag() }}  <!-- CSRFトークン -->
         <label for="username">ユーザー名:</label>
         <input type="text" name="username" required><br>
-
+    {{ form.username }}
+    
         <label for="password">パスワード:</label>
         <input type="password" name="password" required><br>
-
+    {{ form.password }}
+        
         <label for="confirm_password">パスワード確認:</label>
         <input type="password" name="confirm_password" required><br>
-
-        <button type="submit">登録する</button>
-    </form>
+    {{ form.confirm_password }}     
+        
+    <button type="submit">登録する</button>
+</form>
 
     <p>既にアカウントをお持ちですか？ <a href="{{ url_for('login') }}">ログイン</a></p>
 </body>
