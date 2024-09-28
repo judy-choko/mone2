@@ -13,7 +13,7 @@ from forms import RegistrationForm
 
 app = Flask(__name__)
 
-app.config['SECRET_KEY'] = os.urandom(32)
+app.config['SECRET_KEY'] = os.environ("SECRET_KEY")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['PREFERRED_URL_SCHEME'] = 'https'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
