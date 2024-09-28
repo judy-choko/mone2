@@ -69,7 +69,7 @@ def init_db():
     conn = create_server_connection()
     cur = conn.cursor()
     cur.execute('''
-        CREATE TABLE IF NOT EXISTS user (
+        CREATE TABLE IF NOT EXISTS app_user (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT NOT NULL,
             password_hash TEXT NOT NULL
@@ -185,7 +185,7 @@ class DebtTypeForm(FlaskForm):
     monthly_payment = IntegerField('月々の返済額', validators=[DataRequired()])
     submit = SubmitField('追加')
 
-class User:
+class app_user:
     def __init__(self, id, username, password_hash):
         self.id = id
         self.username = username
@@ -261,7 +261,7 @@ def calculate_daily_allowance(income, total_payment, fixed_expenses, total_expen
 def create_monthly_tasks():
     conn =  create_server_connection()
     cur = conn.cursor()
-    users = cur.execute('SELECT id FROM user').fetchall()
+    users = cur.execute('SELECT id FROM app_user').fetchall()
 
     for user in users:
         debt_types = conn.execute('SELECT * FROM debt_type WHERE user_id = ?', (user['id'],)).fetchall()
@@ -311,7 +311,7 @@ scheduler.start()
 def load_user(user_id):
     conn =  create_server_connection()
     cur = conn.cursor()
-    user = cur.execute('SELECT * FROM user WHERE id = ?', (user_id,)).fetchone()
+    user = cur.execute('SELECT * FROM app_user WHERE id = ?', (user_id,)).fetchone()
     conn.close()
     if user:
         return User(user['id'], user['username'], user['password_hash'])
@@ -339,7 +339,7 @@ def register():
 
         conn =  create_server_connection()
         cur = conn.cursor()
-        existing_user = cur.execute('SELECT * FROM user WHERE username = ?', (username,)).fetchone()
+        existing_user = cur.execute('SELECT * FROM app_user WHERE username = ?', (username,)).fetchone()
         if existing_user:
             flash('そのユーザー名は既に使用されています。')
             return redirect(url_for('register'))
@@ -363,7 +363,7 @@ def login():
         # SQLiteでユーザー情報を取得
         conn =  create_server_connection()
         cur = conn.cursor()
-        user = cur.execute('SELECT * FROM user WHERE username = ?', (username,)).fetchone()
+        user = cur.execute('SELECT * FROM app_user WHERE username = ?', (username,)).fetchone()
         conn.close()
         if user and check_password_hash(user['password_hash'], password):
             user_obj = User(user['id'], user['username'], user['password_hash'])
