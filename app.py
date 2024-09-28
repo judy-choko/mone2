@@ -135,6 +135,8 @@ def register():
 def login():
     form = LoginForm()
     if form.validate_on_submit():
+        username = form.username.data
+        password = form.password.data
         # SQLiteでユーザー情報を取得
         conn = get_db_connection()
         user = conn.execute('SELECT * FROM user WHERE username = ?', (username,)).fetchone()
