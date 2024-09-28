@@ -20,6 +20,7 @@ from  matplotlib import rcParams
 from flask_cors import CORS
 import mysql.connector
 import MySQLdb
+import psycopg2
 load_dotenv()
 
 SECRET_KEY = os.getenv("SECRET_KEY")
@@ -27,6 +28,7 @@ PASSWORD = os.getenv("PASSWORD")
 LOCALHOST = os.getenv("LOCALHOST")
 USERNAME = os.getenv("USERNAME")
 DBNAME = os.getenv("DBNAME")
+DATABASE_URL = os.environ['DATABASE_URL']
 # プッシュ
 # Japanese font
 # jp_font = fm.FontProperties(fname='/usr/share/fonts/NotoSansCJKjp/NotoSansCJKjp-DemiLight.otf')
@@ -42,11 +44,12 @@ login_manager.init_app(app)
 login_manager.login_view = 'login'
 
 def create_server_connection():
-    connection = MySQLdb.connect(
-        user=USERNAME, passwd=PASSWORD, host=LOCALHOST, db=DBNAME, charset="utf8"
-    )
+    conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+    # connection = MySQLdb.connect(
+    #     user=USERNAME, passwd=PASSWORD, host=LOCALHOST, db=DBNAME, charset="utf8"
+    # )
     print("MySQL Database connection successful")
-    return connection
+    return conn
 # Datetime adapter for SQLite
 def adapt_datetime(dt):
     return dt.strftime('%Y-%m-%d %H:%M:%S')
