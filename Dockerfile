@@ -5,10 +5,11 @@ FROM python:3.9-slim
 WORKDIR /app
 
 # 必要なパッケージをインストールし、pipをアップグレード
-RUN apt-get update && apt-get install -y --no-install-recommends gcc sudo \
-    && pip install --upgrade pip
+RUN apt-get update && apt-get install -y \
     fonts-noto-cjk \
     libfreetype6-dev \
+    libpng-dev \
+    libjpeg-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # 環境変数からパスワードを設定する
