@@ -13,7 +13,7 @@ RUN apt-get update && \
 RUN wget https://moji.or.jp/wp-content/ipafont/IPAexfont/IPAexfont00301.zip && \
     unzip IPAexfont00301.zip && \
     mkdir -p /usr/share/fonts/ipa && \
-    cp IPAexfont00301/*.ttf /usr/share/fonts/ipa/ && \
+    cp IPAexfont00301/*.ttf /usr/share/fonts/ipa/
 
 # 環境変数からパスワードを設定する
 ARG ROOTPASS
