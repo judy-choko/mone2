@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y \
     libfreetype6-dev \
     libpng-dev \
     libjpeg-dev \
-    && ls /usr/share/fonts/truetype/noto/ \
+    && fc-list :family,file | grep "Noto" \
     && rm -rf /var/lib/apt/lists/*
 
 # 環境変数からパスワードを設定する
