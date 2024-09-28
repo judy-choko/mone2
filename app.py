@@ -78,7 +78,7 @@ def init_db():
     conn.commit()
     cur.execute('''
         CREATE TABLE IF NOT EXISTS expense_category (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id INTEGER PRIMARY KEY SERIAL,
             name TEXT NOT NULL,
             parent_category TEXT NOT NULL,
             user_id INTEGER NOT NULL,
@@ -88,7 +88,7 @@ def init_db():
     conn.commit()
     cur.execute('''
         CREATE TABLE IF NOT EXISTS expense (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id INTEGER PRIMARY KEY SERIAL,
             user_id INTEGER NOT NULL,
             amount INTEGER NOT NULL,
             category_id INTEGER NOT NULL,
@@ -101,7 +101,7 @@ def init_db():
     conn.commit()
     cur.execute('''
 CREATE TABLE IF NOT EXISTS payment_task (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id INTEGER PRIMARY KEY SERIAL,
     user_id INTEGER NOT NULL,
     debt_type_id INTEGER NOT NULL,
     debt_name TEXT NOT NULL,
@@ -115,7 +115,7 @@ CREATE TABLE IF NOT EXISTS payment_task (
     conn.commit()
     cur.execute('''
         CREATE TABLE IF NOT EXISTS debt_type (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id INTEGER PRIMARY KEY SERIAL,
         user_id INTEGER NOT NULL,
         debt_name TEXT NOT NULL,
         total_debt INTEGER NOT NULL,
@@ -126,7 +126,7 @@ CREATE TABLE IF NOT EXISTS payment_task (
     conn.commit()
     cur.execute('''
         CREATE TABLE IF NOT EXISTS income_expense (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id INTEGER PRIMARY KEY SERIAL,
         user_id INTEGER NOT NULL,
         income INTEGER DEFAULT 0,
         expense INTEGER DEFAULT 0,
