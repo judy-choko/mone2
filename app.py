@@ -16,6 +16,7 @@ import matplotlib.font_manager as fm
 from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime, date
 import calendar
+
 load_dotenv()
 
 SECRET_KEY = os.getenv("SECRET_KEY")
@@ -597,6 +598,8 @@ def add_debt_type():
 
 
 if __name__ == '__main__':
+    fonts = fm.findSystemFonts()
+    print([[str(font), fm.FontProperties(fname=font).get_name()] for font in fonts[:10]])
     with app.app_context():
         init_db()  # アプリ起動時にデータベースを初期化
     app.run(host="0.0.0.0", port=8080, debug=True)
