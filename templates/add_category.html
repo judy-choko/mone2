@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>カテゴリを追加</title>
+</head>
+<body>
+    <h1>カテゴリを追加</h1>
+    <form method="POST">
+        <label for="category_name">カテゴリ名:</label>
+        <input type="text" name="category_name" required><br>
+
+        <label for="parent_category">大カテゴリ:</label>
+        <select name="parent_category" required>
+            <option value="固定費">固定費</option>
+            <option value="変動費">変動費</option>
+        </select><br>
+
+        <button type="submit">カテゴリを追加</button>
+    </form>
+
+    <a href="{{ url_for('dashboard') }}">ダッシュボードに戻る</a>
+</body>
+</html>
