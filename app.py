@@ -78,6 +78,11 @@ class AddExpenseForm(FlaskForm):
     description = StringField('説明', validators=[DataRequired()])
     category_id = SelectField('カテゴリ', coerce=int)
     submit = SubmitField('支出を追加')
+
+class TaskForm(FlaskForm):
+    debt_type_id = SelectField('借金の種類', coerce=int, validators=[DataRequired()])
+    due_date = DateField('期日', validators=[DataRequired()])
+    submit = SubmitField('タスクを追加')
     
 @login_manager.user_loader
 def load_user(user_id):
@@ -176,14 +181,55 @@ def logout():
     logout_user()
     return redirect(url_for('login'))
 
-@app.route('/dashboard')
+# タスク追加ルート
+@app.route('/add_task', methods=['GET', 'POST'])
+@login_required
+def add_task():
+    form = TaskForm()
+
+    # 借金の種類を取得して選択肢に設定
+    conn = get_db_connection()
+    debt_types = conn.execute('SELECT id, name FROM debt_type WHERE user_id = ?', (current_user.id,)).fetchall()
+    form.debt_type_id.choices = [(debt['id'], debt['name']) for debt in debt_types]
+    
+    if form.validate_on_submit():
+        # フォームからデータを取得し、タスクを登録
+        debt_type_id = form.debt_type_id.data
+        due_date = form.due_date.data
+
+        conn.execute('INSERT INTO payment_task (user_id, debt_type_id, due_date, is_completed) VALUES (?, ?, ?, ?)', 
+                     (current_user.id, debt_type_id, due_date, False))
+        conn.commit()
+        conn.close()
+
+        flash('タスクが追加されました。')
+        return redirect(url_for('dashboard'))
+
+    return render_template('add_task.html', form=form)
+
+# ダッシュボードルート
+@app.route('/dashboard', methods=['GET'])
 @login_required
 def dashboard():
     conn = get_db_connection()
-    expenses = conn.execute('SELECT * FROM expense WHERE user_id = ?', (current_user.id,)).fetchall()
+    tasks = conn.execute('SELECT * FROM payment_task WHERE user_id = ?', (current_user.id,)).fetchall()
+    debt_types = conn.execute('SELECT * FROM debt_type WHERE user_id = ?', (current_user.id,)).fetchall()
+    income_expense = conn.execute('SELECT * FROM income_expense WHERE user_id = ?', (current_user.id,)).fetchone()
     conn.close()
 
-    return render_template('dashboard.html', expenses=expenses)
+    return render_template('dashboard.html', tasks=tasks, debt_types=debt_types, income_expense=income_expense)
+
+# タスク完了ルート
+@app.route('/complete_task/<int:task_id>')
+@login_required
+def complete_task(task_id):
+    conn = get_db_connection()
+    conn.execute('UPDATE payment_task SET is_completed = 1 WHERE id = ? AND user_id = ?', (task_id, current_user.id))
+    conn.commit()
+    conn.close()
+
+    flash('タスクが完了しました。')
+    return redirect(url_for('dashboard'))
 
 @app.route('/expense_category_chart')
 @login_required
