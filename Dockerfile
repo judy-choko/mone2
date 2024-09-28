@@ -4,6 +4,11 @@ FROM python:3.9-slim
 # 作業ディレクトリを作成
 WORKDIR /app
 
+# 必要なパッケージをシステムにインストール
+# pipの最新バージョンをインストール
+RUN apt-get update && apt-get install -y --no-install-recommends gcc \
+    && pip install --upgrade pip
+
 # 必要なパッケージをインストール
 COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
