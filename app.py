@@ -13,6 +13,10 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get("SECRET_KEY", "defaultsecret")
 csrf = CSRFProtect(app)
 
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
+
 # SQLiteのデータベース接続を取得する関数
 def get_db_connection():
     conn = sqlite3.connect('app.db')
@@ -44,6 +48,15 @@ def init_db():
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
+
+
+
+# ログインフォームの定義
+class LoginForm(FlaskForm):
+    username = StringField('ユーザー名', validators=[DataRequired()])
+    password = PasswordField('パスワード', validators=[DataRequired()])
+    submit = SubmitField('ログイン')
+
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -117,23 +130,17 @@ def register():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        conn = get_db_connection()
-        user = conn.execute('SELECT * FROM user WHERE username = ?', (username,)).fetchone()
-        conn.close()
-
-        if user and check_password_hash(user['password_hash'], password):
-            user_obj = User(user['id'], user['username'], user['password_hash'])
-            login_user(user_obj)
-            return redirect(url_for('dashboard'))
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(username=form.username.data).first()
+        if user and check_password_hash(user.password_hash, form.password.data):
+            login_user(user)
+            return redirect(url_for('dashboard'))  # ダッシュボードへリダイレクト
         else:
-            flash('ユーザー名かパスワードが間違っています。')
-    if request.method == 'GET':
-        return render_template('login.html')
-    else :
-        return render_template('login.html')
+            flash('ユーザー名またはパスワードが正しくありません')
+    
+    return render_template('login.html', form=form)
+
 
 @app.route('/logout')
 @login_required
