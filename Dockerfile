@@ -7,9 +7,9 @@ WORKDIR /app
 
 # パッケージリストの更新と必要なパッケージのインストール
 RUN apt-get update && \
-    apt-get install -y wget \
-    apt-get install -y fontconfig \  # ここでfontconfigをインストール
-    apt-get install -y zip unzip \
+    apt-get install -y wget &&\
+    apt-get install -y fontconfig &&\  # ここでfontconfigをインストール
+    apt-get install -y zip unzip
 
 # IPAフォントをダウンロードしてインストール
 RUN wget https://moji.or.jp/wp-content/ipafont/IPAexfont/IPAexfont00301.zip && \
