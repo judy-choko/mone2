@@ -7,8 +7,11 @@ WORKDIR /app
 
 # パッケージリストの更新と必要なパッケージのインストール
 RUN apt-get update && \
-    apt-get install -y wget fontconfig zip unzip
-
+    apt-get install -y wget fontconfig zip unzip fonts-migmix
+# パッケージのインストールや他の設定
+RUN apt-get update && apt-get install -y \
+    locales \
+    && locale-gen ja_JP.UTF-8
 # IPAフォントをダウンロードしてインストール
 RUN wget https://moji.or.jp/wp-content/ipafont/IPAexfont/IPAexfont00301.zip && \
     unzip IPAexfont00301.zip && \
@@ -34,6 +37,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # 環境変数の設定
 ENV FLASK_ENV=development
 ENV FLASK_APP=app.py
+# 環境変数の設定
+ENV LANG=ja_JP.UTF-8
+ENV PYTHONIOENCODING=utf_8
 
 # ENV FLASK_ENV=production
 
