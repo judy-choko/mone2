@@ -7,6 +7,7 @@
     <title>支出を追加</title>
 </head>
 <body>
+    <div class="card">
     <!-- フラッシュメッセージの表示 -->
     {% with messages = get_flashed_messages() %}
         {% if messages %}
@@ -42,7 +43,7 @@
 
         <button type="submit">支出を追加</button>
     </form>
-
+    </div>
     <a href="{{ url_for('dashboard') }}">ダッシュボードに戻る</a>
 </body>
 </html>
