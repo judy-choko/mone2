@@ -43,10 +43,9 @@ app.config['SECRET_KEY'] = SECRET_KEY
 csrf = CSRFProtect(app)
 
 # Japanese font
-# フォントのパスを相対パスで指定
-# font_path = './fonts/NotoSansCJKjp-DemiLight.otf'
-# jp_font = fm.FontProperties(fname=font_path)
-# plt.rcParams['font.family'] = jp_font.get_name()
+font_path = '/usr/share/fonts/NotoSansCJKjp-DemiLight.otf'
+jp_font = fm.FontProperties(fname=font_path)
+plt.rcParams['font.family'] = jp_font.get_name()
 
 login_manager = LoginManager()
 login_manager.init_app(app)
