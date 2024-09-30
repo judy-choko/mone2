@@ -31,6 +31,7 @@ import re
 import requests
 import base64
 from openai import OpenAI
+from io import BytesIO
 load_dotenv()
 
 SECRET_KEY = os.getenv('SECRET_KEY')
@@ -83,8 +84,9 @@ def gettext(base64_image):
     url = "https://ocr-extract-text.p.rapidapi.com/ocr"
     response = requests.post(url, data=payload, headers=headers)
     print(response)
-    if response.json()['text']:
-
+    try:
+        text_value = response.json()['text']
+        print(text_value)
         # Print the extracted text
         client = OpenAI(
             # This is the default and can be omitted
@@ -99,7 +101,8 @@ def gettext(base64_image):
         res = response.choices[0].message.content
         updated_json = json.loads(res)
         return updated_json
-    else :
+    except KeyError:
+        print("Key 'text' not found in the JSON response")
         return "読み取りエラー"
     
 def get_user_categories(user_id):
@@ -244,8 +247,9 @@ class LoginForm(FlaskForm):
     submit = SubmitField('ログイン')
 
 class addreciptForm(FlaskForm):
-    image = FileField('画像を選択', validators=[DataRequired(), FileAllowed(['jpg', 'png'], '画像形式のみ許可されています')])
+    image = FileField('画像を選択', validators=[DataRequired(), FileAllowed(['jpg', 'png','jpeg','JPEG','PNG','JPG'], '画像形式のみ許可されています')])
     submit = SubmitField('アップロード')
+
 # カテゴリ追加用フォーム
 class AddCategoryForm(FlaskForm):
     category_name = StringField('カテゴリ名', validators=[DataRequired()])
@@ -510,7 +514,7 @@ def logout():
     return redirect(url_for('login'))
 
 # レシート画像アップロードルート
-@app.route('/upload_receipt', methods=['POST'])
+@app.route('/upload_receipt', methods=['GET', 'POST'])
 @login_required
 def upload_receipt():
     form = addreciptForm()
