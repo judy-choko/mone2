@@ -105,6 +105,7 @@ def gettext(data):
     # url = "https://ocr-extract-text.p.rapidapi.com/ocr"
     
     # response = requests.post(url, data=payload, headers=headers)
+    return response
     print(response)
     try:
         text_value = response.json()['fullText']
