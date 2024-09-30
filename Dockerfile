@@ -9,14 +9,11 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # アプリケーションコードとフォントをコピー
-COPY ./app /app
 COPY ./fonts /usr/share/fonts
 
 # フォントキャッシュを更新
 RUN fc-cache -f -v
 
-# ワーキングディレクトリを設定
-WORKDIR /app
 
 # 環境変数からパスワードを設定する
 ARG ROOTPASS
