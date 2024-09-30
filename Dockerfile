@@ -24,9 +24,7 @@ COPY ./templates /app/templates/
 COPY ./fonts /usr/share/fonts
 
 # Copy and unzip the fonts to the appropriate directory
-COPY ./fonts.zip /usr/share/fonts/
-RUN unzip /usr/share/fonts/fonts.zip -d /usr/share/fonts/ \
-    && fc-cache -f -v
+RUN fc-cache -f -v
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -r /app/requirements.txt
