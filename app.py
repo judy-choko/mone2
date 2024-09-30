@@ -82,6 +82,7 @@ def gettext(base64_image):
     # Make the POST request
     url = "https://ocr-extract-text.p.rapidapi.com/ocr"
     response = requests.post(url, data=payload, headers=headers)
+    print(response)
 
     # Print the extracted text
     client = OpenAI(
