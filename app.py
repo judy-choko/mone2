@@ -45,6 +45,12 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
+def get_fonts():
+    font_paths = []
+    for font in fm.findSystemFonts(fontpaths=None, fontext='ttf'):
+        font_paths.append(font)
+    return font_paths
+    
 def create_server_connection():
     conn = psycopg2.connect(DATABASE_URL, sslmode='require')
     # connection = MySQLdb.connect(
@@ -341,6 +347,18 @@ scheduler = BackgroundScheduler()
 scheduler.add_job(func=check_and_reset_incomes, trigger='cron', hour=0)  # 毎日チェック
 scheduler.start()
 
+@app.route('/fonts')
+def show_fonts():
+    fonts = get_fonts()
+    return render_template_string('''
+    <h1>インストールされているフォントのリスト</h1>
+    <ul>
+        {% for font in fonts %}
+            <li>{{ font }}</li>
+        {% endfor %}
+    </ul>
+    ''', fonts=fonts)
+    
 @login_manager.user_loader
 def load_user(user_id):
     conn =  create_server_connection()
