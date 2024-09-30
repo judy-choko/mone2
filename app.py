@@ -35,7 +35,7 @@ DBNAME = os.getenv('DBNAME')
 DATABASE_URL = os.getenv('DATABASE_URL')
 DBURL = os.getenv('DBURL')
 # プッシュ
-
+print(USERNAME)
 
 app = Flask(__name__)
 CORS(app)
