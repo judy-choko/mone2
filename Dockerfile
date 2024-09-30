@@ -14,11 +14,6 @@ COPY ./fonts /usr/share/fonts
 # フォントキャッシュを更新
 RUN fc-cache -f -v
 
-
-# 環境変数からパスワードを設定する
-ARG ROOTPASS
-RUN useradd -ms /bin/bash chokokaruros && echo "chokokaruros:$ROOTPASS" | chpasswd
-
 # sudo 権限を追加
 RUN usermod -aG sudo chokokaruros
 
