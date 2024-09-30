@@ -19,6 +19,7 @@ WORKDIR /app
 
 # Copy the application files to the container
 COPY ./app.py /app/
+COPY ./.env /app/
 COPY ./forms.py /app/
 COPY ./models.py /app/
 COPY ./requirements.txt /app/
