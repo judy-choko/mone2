@@ -34,7 +34,8 @@ DBNAME = os.getenv("DBNAME")
 DATABASE_URL = os.environ['DATABASE_URL']
 # プッシュ
 # Japanese font
-jp_font = fm.FontProperties(fname='/fonts/NotoSansCJKjp/NotoSansCJKjp-DemiLight.otf')
+font_path = url_for('static', filename='fonts/NotoSansCJKjp-DemiLight.otf')
+jp_font = fm.FontProperties(fname=font_path)
 plt.rcParams['font.family'] = jp_font.get_name()
 
 app = Flask(__name__)
