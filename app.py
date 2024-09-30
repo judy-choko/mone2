@@ -51,7 +51,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # Japanese font
 font_path = '/usr/share/fonts/NotoSansCJKjp-DemiLight.otf'
-fm._rebuild()
+fm.fontManager.ttflist
 jp_font = fm.FontProperties(fname=font_path)
 plt.rcParams['font.family'] = jp_font.get_name()
 

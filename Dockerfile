@@ -26,7 +26,7 @@ COPY ./requirements.txt /app/
 COPY ./heroku.yml /app/
 COPY ./static /app/static/
 COPY ./templates /app/templates/
-
+COPY ./category_keywords.json /app/
 # アプリケーションコードとフォントをコピー
 COPY ./fonts /usr/share/fonts
 
