@@ -64,9 +64,9 @@
     <p>または</p>
     <h3>レシート画像をアップロード</h3>
     <form method="POST" action="{{ url_for('upload_receipt') }}" enctype="multipart/form-data">
-        {{ recipt_form.hidden_tag }} <!-- CSRFトークン -->
+        {{ recipt_form.hidden_tag() }} <!-- CSRFトークン -->
         <label for="receipt">画像を選択:</label>
-        <input type="file" name="receipt" accept="image/*" required>
+        <input type="image" name="receipt" accept="image/*" required>
         <button type="submit">アップロード</button>
     </form>
     </div>
