@@ -85,18 +85,30 @@ def gettext(data):
     # Update the payload with the base64 image data
     # payload = f"-----011000010111000001101001\r\nContent-Disposition: form-data; name=\"base64\"\r\n\r\n{encoded_image}\r\n-----011000010111000001101001--\r\n\r\n"
     payload = f"-----011000010111000001101001\r\nContent-Disposition: form-data; name=\"image\"\r\n\r\n{data}\r\n-----011000010111000001101001--\r\n\r\n"
+    files = {
+        'image': data
+    }
+    headers = {
+        "x-rapidapi-key": RAPID_KEY,
+        "x-rapidapi-host": "ocr-wizard.p.rapidapi.com"
+    }
+    response = requests.post(url, files=files, headers=headers)
     # Headers
     headers = {
         "x-rapidapi-key": RAPID_KEY,
-    #     "x-rapidapi-host": "ocr-extract-text.p.rapidapi.com",
+
         "x-rapidapi-host": "ocr-wizard.p.rapidapi.com",
         "Content-Type": "multipart/form-data; boundary=---011000010111000001101001"
     }
+    url = "https://ocr-wizard.p.rapidapi.com/ocr"
 
+
+    response = requests.post(url, files=files, headers=headers)
+    #     "x-rapidapi-host": "ocr-extract-text.p.rapidapi.com",
     # Make the POST request
     # url = "https://ocr-extract-text.p.rapidapi.com/ocr"
-    url = "https://ocr-wizard.p.rapidapi.com/ocr"
-    response = requests.post(url, data=payload, headers=headers)
+    
+    # response = requests.post(url, data=payload, headers=headers)
     print(response)
     try:
         text_value = response.json()['fullText']
