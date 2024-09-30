@@ -23,13 +23,11 @@ import MySQLdb
 import psycopg2
 import psycopg2.extras 
 from flask import Flask, render_template_string
-from boto.s3.connection import S3Connection
-s3 = S3Connection(os.environ['SECRET_KEY'], os.environ['PASSWORD'])
-print(s3)
-# s3 = S3Connection(os.environ['SECRET_KEY'], os.environ['PASSWORD'], os.environ['LOCALHOST'], os.environ['USERNAME'], os.environ['DBNAME'], os.environ['DATABASE_URL'], os.environ['DBURL'])
+
+
 # load_dotenv()
 
-SECRET_KEY = os.getenv('SECRET_KEY')
+SECRET_KEY = os.environ["SECRET_KEY"]
 PASSWORD = os.getenv('PASSWORD')
 LOCALHOST = os.getenv('LOCALHOST')
 USERNAME = os.getenv('USERNAME')
