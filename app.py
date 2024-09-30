@@ -80,7 +80,8 @@ def get_fonts():
 
 
 def gettext(data):
-    encoded_image = base64.b64encode(data).decode('utf-8')
+    encoded_image = base64.b64encode(data.getvalue()).decode('utf-8')
+    # encoded_image = base64.b64encode(data).decode('utf-8')
     # Update the payload with the base64 image data
     payload = f"-----011000010111000001101001\r\nContent-Disposition: form-data; name=\"base64\"\r\n\r\n{encoded_image}\r\n-----011000010111000001101001--\r\n\r\n"
 
