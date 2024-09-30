@@ -14,15 +14,6 @@ COPY ./fonts /usr/share/fonts
 # フォントキャッシュを更新
 RUN fc-cache -f -v
 
-# sudo 権限を追加
-RUN usermod -aG sudo chokokaruros
-
-# アプリケーションコードをコピー
-COPY --chown=chokokaruros:chokokaruros . .
-
-# chokokarurosユーザーに切り替える
-USER chokokaruros
-
 # 必要なパッケージをインストール
 RUN pip install --no-cache-dir -r requirements.txt
 
