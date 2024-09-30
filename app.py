@@ -115,7 +115,7 @@ def gettext(data):
         return updated_json
     except KeyError:
         print("Key 'text' not found in the JSON response")
-        return "読み取りエラー"
+        return response
     
 def get_user_categories(user_id):
     conn = create_server_connection()
@@ -524,6 +524,8 @@ def upload_receipt():
         # 画像をバイナリ形式で読み込み
         processed_image = process_image(file)
         data_lest = gettext(processed_image)
+        flash('data_lest')
+        return redirect(url_for('dashboard'))
         if data_lest=="読み取りエラー":
             flash('読み取りできませんでした')
             return redirect(url_for('dashboard'))
