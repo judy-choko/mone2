@@ -118,11 +118,6 @@ def get_user_categories(user_id):
     conn.close()
     return categories
 
-file_path='category_keywords.json'
-
-def load_category_keywords():
-    with open(file_path, 'r', encoding='utf-8') as f:
-        return json.load(f)
         
 def create_server_connection():
     conn = psycopg2.connect(DATABASE_URL, sslmode='require')
@@ -234,12 +229,6 @@ def init_db():
     
     conn.close()
     
-# SQLiteデータベース接続関数
-def get_db_connection():
-    conn = sqlite3.connect('app.db', detect_types=sqlite3.PARSE_DECLTYPES)
-    conn.row_factory = sqlite3.Row  # クエリ結果を辞書形式で取得
-    return conn
-
 
 # ログインフォームの定義
 class LoginForm(FlaskForm):
@@ -631,7 +620,6 @@ def dashboard():
     for task in tasks:
         task_dict = dict(task)  # Rowオブジェクトを辞書に変換
         task_list.append(task_dict)
-    print(task_list)
     cur.execute('SELECT * FROM debt_type WHERE user_id = %s ', (current_user.id,))
     debt_types = cur.fetchall()
     conn.commit()
@@ -700,7 +688,6 @@ def expense_category_chart():
 
     labels = [expense['name'] for expense in expenses]
     values = [expense['total_amount'] for expense in expenses]
-    print(labels,values)
     try:
         fig, ax = plt.subplots(figsize=(2, 2))  # 幅5インチ、高さ3インチの画像
         wedges, texts, autotexts = ax.pie(values, labels=labels, autopct='%1.1f%%', startangle=90)

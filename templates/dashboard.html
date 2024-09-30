@@ -74,7 +74,7 @@
     <form method="POST" action="{{ url_for('upload_receipt') }}" enctype="multipart/form-data">
         {{ recipt_form.hidden_tag() }} <!-- CSRFトークン -->
         {{ recipt_form.image.label }} {{ recipt_form.image() }}<br><br>
-        <button type="submit">アップロード</button>
+        {{ recipt_form.submit() }}
     </form>
     </div>
     <div class="card">
