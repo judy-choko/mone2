@@ -56,8 +56,8 @@ def get_fonts():
     return font_paths
     
 def create_server_connection():
-    # conn = psycopg2.connect(DATABASE_URL, sslmode='require')
-    conn = psycopg2.connect(f'host={LOCALHOST} port=5432 dbname={DBNAME}  user={USERNAME} password={PASSWORD}')
+    conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+    # conn = psycopg2.connect(f'host={LOCALHOST} port=5432 dbname={DBNAME}  user={USERNAME} password={PASSWORD}')
     # connection = MySQLdb.connect(
     #     user=USERNAME, passwd=PASSWORD, host=LOCALHOST, db=DBNAME, charset="utf8"
     # )
