@@ -83,21 +83,24 @@ def gettext(base64_image):
     url = "https://ocr-extract-text.p.rapidapi.com/ocr"
     response = requests.post(url, data=payload, headers=headers)
     print(response)
+    if response.json()['text']:
 
-    # Print the extracted text
-    client = OpenAI(
-        # This is the default and can be omitted
-        api_key=OPEN_AI_KEY,
-    )
-    prompt = '購入した商品と金額のデータを作成して。JSON形式のデータのみ返してください。コードブロックとしてではなく、直接JSONデータだけをお願いします。カテゴリは固定費：住宅費、水道光熱費、通信料、保険料、車両費、保育料・学費、税金、習い事、交通費、小遣い、その他。変動費：食費、日用品費、医療費、子ども費、被服費、美容費、交際費、娯楽費、雑費、特別費。の中から選び、データのフォーマットは次の通りです。{data:[{"name":項目名,"price":金額,"parent_category":固定費or変動費,"category":カテゴリ名},]}以下データ：'+response.json()['text']
-    messages = [{"role": "system", "content": prompt}]
-    response = client.chat.completions.create(
-            model="gpt-4o",
-            messages=messages
+        # Print the extracted text
+        client = OpenAI(
+            # This is the default and can be omitted
+            api_key=OPEN_AI_KEY,
         )
-    res = response.choices[0].message.content
-    updated_json = json.loads(res)
-    return updated_json
+        prompt = '購入した商品と金額のデータを作成して。JSON形式のデータのみ返してください。コードブロックとしてではなく、直接JSONデータだけをお願いします。カテゴリは固定費：住宅費、水道光熱費、通信料、保険料、車両費、保育料・学費、税金、習い事、交通費、小遣い、その他。変動費：食費、日用品費、医療費、子ども費、被服費、美容費、交際費、娯楽費、雑費、特別費。の中から選び、データのフォーマットは次の通りです。{data:[{"name":項目名,"price":金額,"parent_category":固定費or変動費,"category":カテゴリ名},]}以下データ：'+response.json()['text']
+        messages = [{"role": "system", "content": prompt}]
+        response = client.chat.completions.create(
+                model="gpt-4o",
+                messages=messages
+            )
+        res = response.choices[0].message.content
+        updated_json = json.loads(res)
+        return updated_json
+    else :
+        return "読み取りエラー"
     
 def get_user_categories(user_id):
     conn = create_server_connection()
@@ -513,13 +516,14 @@ def upload_receipt():
     form = addreciptForm()
     if form.validate_on_submit():
         file = form.image.data  # 画像ファイルを取得
-        
         # 画像をバイナリ形式で読み込み
         image_data = file.read()
-        
         # base64でエンコード
         encoded_image = base64.b64encode(image_data).decode('utf-8')
         data_lest = gettext(encoded_image)
+        if data_lest=="読み取りエラー":
+            flash('読み取りできませんでした')
+            return redirect(url_for('dashboard'))
         if data_lest:
             for i in range(len(data_lest["data"])):
                 name = data_lest["data"][i]["name"]
