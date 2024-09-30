@@ -34,8 +34,8 @@ DBNAME = os.getenv("DBNAME")
 DATABASE_URL = os.environ['DATABASE_URL']
 # プッシュ
 # Japanese font
-# jp_font = fm.FontProperties(fname='/usr/share/fonts/NotoSansCJKjp/NotoSansCJKjp-DemiLight.otf')
-# plt.rcParams['font.family'] = jp_font.get_name()
+jp_font = fm.FontProperties(fname='/fonts/NotoSansCJKjp/NotoSansCJKjp-DemiLight.otf')
+plt.rcParams['font.family'] = jp_font.get_name()
 
 app = Flask(__name__)
 CORS(app)
