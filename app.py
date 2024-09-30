@@ -585,7 +585,7 @@ def expense_category_chart():
     print(labels,values)
     try:
         fig, ax = plt.subplots(figsize=(2, 2))  # 幅5インチ、高さ3インチの画像
-        wedges, texts, autotexts = ax.pie(values, labels=labels, autopct='%1.1f%%', startangle=90)
+        wedges, texts, autotexts = ax.pie(values, labels=labels, autopct='%1.1f%%', startangle=90,, fontproperties=jp_font)
         ax.axis('equal')
         img = io.BytesIO()
         plt.savefig(img, format='png', dpi=150)  # dpi=300 で解像度を設定
