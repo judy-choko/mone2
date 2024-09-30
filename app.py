@@ -25,9 +25,9 @@ import psycopg2.extras
 from flask import Flask, render_template_string
 
 
-# load_dotenv()
+load_dotenv()
 
-SECRET_KEY = os.environ["SECRET_KEY"]
+SECRET_KEY = os.getenv('SECRET_KEY')
 PASSWORD = os.getenv('PASSWORD')
 LOCALHOST = os.getenv('LOCALHOST')
 USERNAME = os.getenv('USERNAME')
@@ -35,7 +35,7 @@ DBNAME = os.getenv('DBNAME')
 DATABASE_URL = os.getenv('DATABASE_URL')
 DBURL = os.getenv('DBURL')
 # プッシュ
-print(SECRET_KEY)
+
 
 app = Flask(__name__)
 CORS(app)
