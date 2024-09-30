@@ -8,7 +8,7 @@ from forms import RegistrationForm
 import io
 import matplotlib.pyplot as plt
 from flask_wtf import FlaskForm
-from wtforms import StringField, IntegerField, SelectField, SubmitField, PasswordField, DateField 
+from wtforms import StringField, IntegerField, SelectField,FileField, SubmitField, PasswordField, DateField 
 from wtforms.validators import DataRequired
 from dotenv import load_dotenv
 from datetime import datetime
@@ -265,6 +265,9 @@ class LoginForm(FlaskForm):
     password = PasswordField('パスワード', validators=[DataRequired()])
     submit = SubmitField('ログイン')
 
+class addreciptForm(FlaskForm):
+    image = FileField('画像を選択', validators=[DataRequired()])
+    submit = SubmitField('アップロード')
 # カテゴリ追加用フォーム
 class AddCategoryForm(FlaskForm):
     category_name = StringField('カテゴリ名', validators=[DataRequired()])
@@ -533,45 +536,41 @@ def logout():
 @login_required
 def upload_receipt():
     # ファイルが正しく送信されているか確認
-    if 'receipt' not in request.files:
-        flash('ファイルがありません')
-        return redirect(url_for('dashboard'))
+    form = addreciptForm()
+    if form.validate_on_submit():
+        file = form.image.data
+        if file:
+            filename = secure_filename(file.filename)
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(file_path)
+            # アップロードされた画像からテキストを抽出
+            extracted_text = extract_text_from_image(file_path)
 
-    file = request.files['receipt']
+            if extracted_text=="テキスト抽出に失敗しました":
+                flash('画像の登録に失敗しました')
+                return redirect(url_for('dashboard'))
+        
+            for item in extracted_text:
+                print(f"商品: {item['item']}, 金額: {item['amount']}円")
+                conn =  create_server_connection()
+                cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+                category_id  = categorize_item(item['item'], current_user.id)
+                # データベースに支出を追加
+                cur.execute('INSERT INTO expense (user_id, amount, category_id, description) VALUES (%s, %s, %s, %s)', 
+                     (current_user.id, item['amount'], category_id, "レシートからの登録"))
+                conn.commit()
+                conn.close()
+            flash('画像のアップロードが成功しました: {}'.format(extracted_text))
 
-    if file.filename == '':
-        flash('ファイルが選択されていません')
-        return redirect(url_for('dashboard'))
+            # 画像処理後、不要なら削除
+            os.remove(file_path)
 
-    if file and allowed_file(file.filename):
-        # ファイル名をセキュアにして保存
-        filename = secure_filename(file.filename)
-        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        file.save(file_path)
-
-        # アップロードされた画像からテキストを抽出
-        extracted_text = extract_text_from_image(file_path)
-        if extracted_text=="テキスト抽出に失敗しました":
-            flash('画像の登録に失敗しました')
+            return redirect(url_for('dashboard'))
+    
+        if file.filename == '':
+            flash('ファイルが選択されていません')
             return redirect(url_for('dashboard'))
         
-        for item in extracted_text:
-            print(f"商品: {item['item']}, 金額: {item['amount']}円")
-            conn =  create_server_connection()
-            cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-            category_id  = categorize_item(item['item'], current_user.id)
-        # データベースに支出を追加
-            cur.execute('INSERT INTO expense (user_id, amount, category_id, description) VALUES (%s, %s, %s, %s)', 
-                     (current_user.id, item['amount'], category_id, "レシートからの登録"))
-            conn.commit()
-            conn.close()
-        flash('画像のアップロードが成功しました: {}'.format(extracted_text))
-
-        # 画像処理後、不要なら削除
-        os.remove(file_path)
-
-        return redirect(url_for('dashboard'))
-
     flash('許可されていないファイル形式です')
     return redirect(url_for('dashboard'))
 
@@ -681,6 +680,7 @@ def dashboard():
     category_form = AddCategoryForm()
     debt_form = DebtTypeForm()
     reset_form = ResetDayForm()
+    recipt_form = addreciptForm()
 
     # フォームをテンプレートに渡す
     return render_template('dashboard.html', 
@@ -695,7 +695,8 @@ def dashboard():
                            total_expense=total_expenses,
                            month_total_payment=total_payment,
                            daily_allowance=daily_allowance,
-                           reset_form = reset_form)
+                           reset_form = reset_form,
+                           recipt_form = recipt_form)
 
 
 
