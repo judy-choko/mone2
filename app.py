@@ -92,18 +92,14 @@ def gettext(data):
         "x-rapidapi-key": RAPID_KEY,
         "x-rapidapi-host": "ocr-wizard.p.rapidapi.com"
     }
+    url = "https://ocr-wizard.p.rapidapi.com/ocr"
     response = requests.post(url, files=files, headers=headers)
     # Headers
-    headers = {
-        "x-rapidapi-key": RAPID_KEY,
-
-        "x-rapidapi-host": "ocr-wizard.p.rapidapi.com",
-        "Content-Type": "multipart/form-data; boundary=---011000010111000001101001"
-    }
-    url = "https://ocr-wizard.p.rapidapi.com/ocr"
-
-
-    response = requests.post(url, files=files, headers=headers)
+    # headers = {
+    #     "x-rapidapi-key": RAPID_KEY,
+    #     "x-rapidapi-host": "ocr-wizard.p.rapidapi.com",
+    #     "Content-Type": "multipart/form-data; boundary=---011000010111000001101001"
+    # }
     #     "x-rapidapi-host": "ocr-extract-text.p.rapidapi.com",
     # Make the POST request
     # url = "https://ocr-extract-text.p.rapidapi.com/ocr"
