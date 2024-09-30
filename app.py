@@ -55,7 +55,14 @@ def get_fonts():
     for font in fm.findSystemFonts(fontpaths=None, fontext='ttf'):
         font_paths.append(font)
     return font_paths
-    
+
+def get_server_connection():
+    connection = MySQLdb.connect(
+        user=USERNAME, passwd=PASSWORD, host=LOCALHOST, db=DBNAME, charset="utf8"
+    )
+    print("MySQL Database connection successful")
+    return connection
+
 def create_server_connection():
     # conn = psycopg2.connect(DATABASE_URL)
     # conn = psycopg2.connect(dbname=DBNAME,host=LOCALHOST,port=5432,user=USERNAME,password=PASSWORD,sslmode="require")
@@ -83,7 +90,8 @@ sqlite3.register_converter("timestamp", convert_datetime)
 # データベース初期化関数
 def init_db():
     print("データベースを構築します")
-    conn = create_server_connection()
+    conn = get_server_connection()
+    # conn = create_server_connection()
     cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
     cur.execute('''
         CREATE TABLE IF NOT EXISTS app_user (
