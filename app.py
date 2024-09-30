@@ -47,7 +47,6 @@ app = Flask(__name__)
 CORS(app)
 app.config['SECRET_KEY'] = SECRET_KEY
 csrf = CSRFProtect(app)
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # Japanese font
 font_path = '/usr/share/fonts/NotoSansCJKjp-DemiLight.otf'
@@ -541,7 +540,7 @@ def upload_receipt():
         file = form.image.data
         if file:
             filename = secure_filename(file.filename)
-            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file_path = os.path.join(UPLOAD_FOLDER, file.filename)
             file.save(file_path)
             # アップロードされた画像からテキストを抽出
             extracted_text = extract_text_from_image(file_path)
@@ -859,8 +858,8 @@ def add_debt_type():
 
 
 if __name__ == '__main__':
-    if not os.path.exists(app.config['UPLOAD_FOLDER']):
-        os.makedirs(app.config['UPLOAD_FOLDER'])
+    if not os.path.exists(UPLOAD_FOLDER):
+        os.makedirs(UPLOAD_FOLDER)
     with app.app_context():
         init_db()  # アプリ起動時にデータベースを初期化
     app.run(host="0.0.0.0", port=8080, debug=True)
