@@ -5,7 +5,7 @@ FROM python:3.9-slim
 # 必要なパッケージをインストール
 RUN apt-get update && apt-get install -y \
     pkg-config \
-    libmysqlclient-dev \
+    libmariadb-dev \
     gcc \
     g++ \
     apt-utils \
