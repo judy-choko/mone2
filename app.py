@@ -32,6 +32,7 @@ LOCALHOST = os.getenv("LOCALHOST")
 USERNAME = os.getenv("USERNAME")
 DBNAME = os.getenv("DBNAME")
 DATABASE_URL = os.getenv('DATABASE_URL')
+DBURL = os.getenv('DBURL')
 # プッシュ
 
 app = Flask(__name__)
@@ -57,9 +58,9 @@ def get_fonts():
     
 def create_server_connection():
     # conn = psycopg2.connect(DATABASE_URL)
-    conn = psycopg2.connect(dbname=DBNAME,host=LOCALHOST,port=5432,user=USERNAME,password=PASSWORD,sslmode="require")
+    # conn = psycopg2.connect(dbname=DBNAME,host=LOCALHOST,port=5432,user=USERNAME,password=PASSWORD,sslmode="require")
     # conn = psycopg2.connect(dbname=DBNAME, user=USERNAME, password=PASSWORD)
-    # conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+    conn = psycopg2.connect(DBURL, sslmode='require')
     # conn = psycopg2.connect(f'host={LOCALHOST} port=5432 dbname={DBNAME}  user={USERNAME} password={PASSWORD}')
     # connection = MySQLdb.connect(
     #     user=USERNAME, passwd=PASSWORD, host=LOCALHOST, db=DBNAME, charset="utf8"
