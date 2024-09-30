@@ -37,6 +37,7 @@ DBNAME = os.environ['DBNAME']
 DATABASE_URL = os.environ['DATABASE_URL']
 DBURL = os.environ['DBURL']
 # プッシュ
+print(SECRET_KEY)
 
 app = Flask(__name__)
 CORS(app)
