@@ -31,7 +31,7 @@ PASSWORD = os.getenv("PASSWORD")
 LOCALHOST = os.getenv("LOCALHOST")
 USERNAME = os.getenv("USERNAME")
 DBNAME = os.getenv("DBNAME")
-DATABASE_URL = os.environ['DATABASE_URL']
+DATABASE_URL = os.getenv('DATABASE_URL')
 # プッシュ
 
 app = Flask(__name__)
