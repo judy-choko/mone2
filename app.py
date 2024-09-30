@@ -88,23 +88,25 @@ def gettext(data):
     # Headers
     headers = {
         "x-rapidapi-key": RAPID_KEY,
-        "x-rapidapi-host": "ocr-extract-text.p.rapidapi.com",
+    #     "x-rapidapi-host": "ocr-extract-text.p.rapidapi.com",
+        "x-rapidapi-host": "ocr-wizard.p.rapidapi.com",
         "Content-Type": "multipart/form-data; boundary=---011000010111000001101001"
     }
 
     # Make the POST request
-    url = "https://ocr-extract-text.p.rapidapi.com/ocr"
+    # url = "https://ocr-extract-text.p.rapidapi.com/ocr"
+    url = "https://ocr-wizard.p.rapidapi.com/ocr"
     response = requests.post(url, data=payload, headers=headers)
     print(response)
     try:
-        text_value = response.json()['text']
+        text_value = response.json()['fullText']
         print(text_value)
         # Print the extracted text
         client = OpenAI(
             # This is the default and can be omitted
             api_key=OPEN_AI_KEY,
         )
-        prompt = '購入した商品と金額のデータを作成して。JSON形式のデータのみ返してください。コードブロックとしてではなく、直接JSONデータだけをお願いします。カテゴリは固定費：住宅費、水道光熱費、通信料、保険料、車両費、保育料・学費、税金、習い事、交通費、小遣い、その他。変動費：食費、日用品費、医療費、子ども費、被服費、美容費、交際費、娯楽費、雑費、特別費。の中から選び、データのフォーマットは次の通りです。{data:[{"name":項目名,"price":金額,"parent_category":固定費or変動費,"category":カテゴリ名},]}以下データ：'+response.json()['text']
+        prompt = '購入した商品と金額のデータを作成して。JSON形式のデータのみ返してください。コードブロックとしてではなく、直接JSONデータだけをお願いします。カテゴリは固定費：住宅費、水道光熱費、通信料、保険料、車両費、保育料・学費、税金、習い事、交通費、小遣い、その他。変動費：食費、日用品費、医療費、子ども費、被服費、美容費、交際費、娯楽費、雑費、特別費。の中から選び、データのフォーマットは次の通りです。{data:[{"name":項目名,"price":金額,"parent_category":固定費or変動費,"category":カテゴリ名},]}以下データ：'+response.json()['fullText']
         messages = [{"role": "system", "content": prompt}]
         response = client.chat.completions.create(
                 model="gpt-4o",
