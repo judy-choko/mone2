@@ -13,5 +13,4 @@ flask-cors
 mysql-connector-python
 mysqlclient
 psycopg2
-boto
-pytesseract
+openai

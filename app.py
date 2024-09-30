@@ -8,7 +8,8 @@ from forms import RegistrationForm
 import io
 import matplotlib.pyplot as plt
 from flask_wtf import FlaskForm
-from wtforms import StringField, IntegerField, SelectField,FileField, SubmitField, PasswordField, DateField 
+from wtforms import StringField, IntegerField, SelectField,FileField, SubmitField, PasswordField, DateField
+from flask_wtf.file import FileField, FileAllowed
 from wtforms.validators import DataRequired
 from dotenv import load_dotenv
 from datetime import datetime
@@ -27,7 +28,10 @@ from werkzeug.utils import secure_filename
 from PIL import Image
 import pytesseract 
 import json
-
+import re
+import requests
+import base64
+from openai import OpenAI
 load_dotenv()
 
 SECRET_KEY = os.getenv('SECRET_KEY')
@@ -37,9 +41,9 @@ USERNAME = os.getenv('USERNAME')
 DBNAME = os.getenv('DBNAME')
 DATABASE_URL = os.getenv('DATABASE_URL')
 DBURL = os.getenv('DBURL')
+RAPID_KEY = os.getenv('RAPID_KEY')
+OPEN_AI_KEY= os.getenv('OPEN_AI_KEY')
 # プッシュ
-# アップロードフォルダの設定
-UPLOAD_FOLDER = './uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 
@@ -64,37 +68,36 @@ def get_fonts():
         font_paths.append(font)
     return font_paths
 
-# アップロードされたファイルが許可された形式かどうか確認
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-import re
+def gettext(base64_image):
+    # Update the payload with the base64 image data
+    payload = f"-----011000010111000001101001\r\nContent-Disposition: form-data; name=\"base64\"\r\n\r\n{base64_image}\r\n-----011000010111000001101001--\r\n\r\n"
 
-# 画像からテキストを抽出する関数
-def extract_text_from_image(image_path):
-    try:
-        # 画像からテキストをOCRで抽出
-        image = Image.open(image_path)
-        text = pytesseract.image_to_string(image, lang='jpn')  # 日本語のOCR
-        # 改行や連続する空白を1つの空白に変換
-        texts = re.sub(r'\s+', ' ', text.strip())
+    # Headers
+    headers = {
+        "x-rapidapi-key": RAPID_KEY,
+        "x-rapidapi-host": "ocr-extract-text.p.rapidapi.com",
+        "Content-Type": "multipart/form-data; boundary=---011000010111000001101001"
+    }
 
-        # 明細と金額を区切るための正規表現
-        # 明細部分は空白、金額部分は最後に「円」または数字で終わる
-        pattern = r'(.*?)\s+(\d+,\d+|\d+円|\d+)'
-        matches = re.findall(pattern, texts)
+    # Make the POST request
+    url = "https://ocr-extract-text.p.rapidapi.com/ocr"
+    response = requests.post(url, data=payload, headers=headers)
 
-        # 各明細と金額を抽出
-        items = []
-        for match in matches:
-            item_name = match[0].strip()  # 明細部分
-            amount = match[1].replace(',', '').replace('円', '')  # 金額部分
-            items.append({'item': item_name, 'amount': int(amount)})
-            return items
-
-    except Exception as e:
-        print(f"画像処理エラー: {e}")
-        return "テキスト抽出に失敗しました"
+    # Print the extracted text
+    client = OpenAI(
+        # This is the default and can be omitted
+        api_key=OPEN_AI_KEY,
+    )
+    prompt = '購入した商品と金額のデータを作成して。JSON形式のデータのみ返してください。コードブロックとしてではなく、直接JSONデータだけをお願いします。カテゴリは固定費：住宅費、水道光熱費、通信料、保険料、車両費、保育料・学費、税金、習い事、交通費、小遣い、その他。変動費：食費、日用品費、医療費、子ども費、被服費、美容費、交際費、娯楽費、雑費、特別費。の中から選び、データのフォーマットは次の通りです。{data:[{"name":項目名,"price":金額,"parent_category":固定費or変動費,"category":カテゴリ名},]}以下データ：'+response.json()['text']
+    messages = [{"role": "system", "content": prompt}]
+    response = client.chat.completions.create(
+            model="gpt-4o",
+            messages=messages
+        )
+    res = response.choices[0].message.content
+    updated_json = json.loads(res)
+    return list_data
     
 def get_user_categories(user_id):
     conn = create_server_connection()
@@ -113,36 +116,9 @@ file_path='category_keywords.json'
 def load_category_keywords():
     with open(file_path, 'r', encoding='utf-8') as f:
         return json.load(f)
-    
-def categorize_item(item_name, user_id):
-    # ユーザーのカテゴリリストを取得
-    user_categories = get_user_categories(user_id)
-    
-    # カテゴリ名とIDをキーとした辞書を作成
-    user_category_dict = {category['expense_category']: category['id'] for category in user_categories}
-    category_keywords = load_category_keywords()
-    # キーワードに基づくカテゴリを判定
-    for category_name, keywords in category_keywords.items():
-        for keyword in keywords:
-            if keyword in item_name:
-                # キーワードが一致したカテゴリがユーザーのカテゴリに存在するか確認
-                if category_name in user_category_dict:
-                    return user_category_dict[id]  # 一致するカテゴリIDを返す
-                else:
-                    return 1  # 一致するカテゴリがなければ「その他」を返す
-
-    # キーワードに一致しない場合も「その他」に分類
-    return 1
-    
+        
 def create_server_connection():
-    # conn = psycopg2.connect(DATABASE_URL)
-    # conn = psycopg2.connect(dbname=DBNAME,host=LOCALHOST,port=5432,user=USERNAME,password=PASSWORD,sslmode="require")
-    # conn = psycopg2.connect(dbname=DBNAME, user=USERNAME, password=PASSWORD)
     conn = psycopg2.connect(DATABASE_URL, sslmode='require')
-    # conn = psycopg2.connect(f'host={LOCALHOST} port=5432 dbname={DBNAME}  user={USERNAME} password={PASSWORD}')
-    # connection = MySQLdb.connect(
-    #     user=USERNAME, passwd=PASSWORD, host=LOCALHOST, db=DBNAME, charset="utf8"
-    # )
     print("MySQL Database connection successful")
     return conn
 # Datetime adapter for SQLite
@@ -265,7 +241,7 @@ class LoginForm(FlaskForm):
     submit = SubmitField('ログイン')
 
 class addreciptForm(FlaskForm):
-    image = FileField('画像を選択', validators=[DataRequired()])
+    image = FileField('画像を選択', validators=[DataRequired(), FileAllowed(['jpg', 'png'], '画像形式のみ許可されています')])
     submit = SubmitField('アップロード')
 # カテゴリ追加用フォーム
 class AddCategoryForm(FlaskForm):
@@ -534,41 +510,40 @@ def logout():
 @app.route('/upload_receipt', methods=['POST'])
 @login_required
 def upload_receipt():
-    if not os.path.exists(UPLOAD_FOLDER):
-        os.makedirs(UPLOAD_FOLDER)
-    # ファイルが正しく送信されているか確認
     form = addreciptForm()
     if form.validate_on_submit():
-        file = form.image.data
-        if file:
-            filename = secure_filename(file.filename)
-            file_path = os.path.join(UPLOAD_FOLDER, file.filename)
-            file.save(file_path)
-            # アップロードされた画像からテキストを抽出
-            extracted_text = extract_text_from_image(file_path)
-
-            if extracted_text=="テキスト抽出に失敗しました":
-                flash('画像の登録に失敗しました')
-                return redirect(url_for('dashboard'))
+        file = form.image.data  # 画像ファイルを取得
         
-            for item in extracted_text:
-                print(f"商品: {item['item']}, 金額: {item['amount']}円")
+        # 画像をバイナリ形式で読み込み
+        image_data = file.read()
+        
+        # base64でエンコード
+        encoded_image = base64.b64encode(image_data).decode('utf-8')
+        data_lest = gettext(encoded_image)
+        if data_lest:
+            for i in range(len(data_lest["data"])):
+                name = data_lest["data"][i]["name"]
+                price = data_lest["data"][i]["price"]
+                parent_category = data_lest["data"][i]["parent_category"]
+                category = data_lest["data"][i]["category"]
                 conn =  create_server_connection()
                 cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-                category_id  = categorize_item(item['item'], current_user.id)
+                cur.execute("""
+                            SELECT id 
+                            FROM expense_category 
+                            WHERE user_id = %s AND category_name = %s;
+                            """, (current_user.id, category))
                 # データベースに支出を追加
+                category_id = cur.fetchone()
+                conn.commit()
                 cur.execute('INSERT INTO expense (user_id, amount, category_id, description) VALUES (%s, %s, %s, %s)', 
-                     (current_user.id, item['amount'], category_id, "レシートからの登録"))
+                     (current_user.id, price, category_id, name))
                 conn.commit()
                 conn.close()
-            flash('画像のアップロードが成功しました: {}'.format(extracted_text))
-
-            # 画像処理後、不要なら削除
-            os.remove(file_path)
-
+            flash('画像のアップロードが成功しました')
             return redirect(url_for('dashboard'))
     
-        if file.filename == '':
+        if data_lest == '':
             flash('ファイルが選択されていません')
             return redirect(url_for('dashboard'))
         
