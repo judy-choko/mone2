@@ -23,7 +23,10 @@ import MySQLdb
 import psycopg2
 import psycopg2.extras 
 from flask import Flask, render_template_string
-
+from werkzeug.utils import secure_filename
+from PIL import Image
+import pytesseract 
+import json
 
 load_dotenv()
 
@@ -35,15 +38,20 @@ DBNAME = os.getenv('DBNAME')
 DATABASE_URL = os.getenv('DATABASE_URL')
 DBURL = os.getenv('DBURL')
 # プッシュ
+# アップロードフォルダの設定
+UPLOAD_FOLDER = './uploads'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 
 app = Flask(__name__)
 CORS(app)
 app.config['SECRET_KEY'] = SECRET_KEY
 csrf = CSRFProtect(app)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # Japanese font
 font_path = '/usr/share/fonts/NotoSansCJKjp-DemiLight.otf'
+fm._rebuild()
 jp_font = fm.FontProperties(fname=font_path)
 plt.rcParams['font.family'] = jp_font.get_name()
 
@@ -57,7 +65,76 @@ def get_fonts():
         font_paths.append(font)
     return font_paths
 
+# アップロードされたファイルが許可された形式かどうか確認
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+import re
+
+# 画像からテキストを抽出する関数
+def extract_text_from_image(image_path):
+    try:
+        # 画像からテキストをOCRで抽出
+        image = Image.open(image_path)
+        text = pytesseract.image_to_string(image, lang='jpn')  # 日本語のOCR
+        # 改行や連続する空白を1つの空白に変換
+        texts = re.sub(r'\s+', ' ', text.strip())
+
+        # 明細と金額を区切るための正規表現
+        # 明細部分は空白、金額部分は最後に「円」または数字で終わる
+        pattern = r'(.*?)\s+(\d+,\d+|\d+円|\d+)'
+        matches = re.findall(pattern, texts)
+
+        # 各明細と金額を抽出
+        items = []
+        for match in matches:
+            item_name = match[0].strip()  # 明細部分
+            amount = match[1].replace(',', '').replace('円', '')  # 金額部分
+            items.append({'item': item_name, 'amount': int(amount)})
+            return items
+
+    except Exception as e:
+        print(f"画像処理エラー: {e}")
+        return "テキスト抽出に失敗しました"
+    
+def get_user_categories(user_id):
+    conn = create_server_connection()
+    cur = conn.cursor()
+    cur.execute('''
+        SELECT expense_category ,id 
+        FROM expense_category
+        ANDuser_id = %s 
+    ''', (user_id,))
+    categories = cur.fetchall()
+    conn.close()
+    return categories
+
+file_path='category_keywords.json'
+
+def load_category_keywords():
+    with open(file_path, 'r', encoding='utf-8') as f:
+        return json.load(f)
+    
+def categorize_item(item_name, user_id):
+    # ユーザーのカテゴリリストを取得
+    user_categories = get_user_categories(user_id)
+    
+    # カテゴリ名とIDをキーとした辞書を作成
+    user_category_dict = {category['expense_category']: category['id'] for category in user_categories}
+    category_keywords = load_category_keywords()
+    # キーワードに基づくカテゴリを判定
+    for category_name, keywords in category_keywords.items():
+        for keyword in keywords:
+            if keyword in item_name:
+                # キーワードが一致したカテゴリがユーザーのカテゴリに存在するか確認
+                if category_name in user_category_dict:
+                    return user_category_dict[id]  # 一致するカテゴリIDを返す
+                else:
+                    return 1  # 一致するカテゴリがなければ「その他」を返す
+
+    # キーワードに一致しない場合も「その他」に分類
+    return 1
+    
 def create_server_connection():
     # conn = psycopg2.connect(DATABASE_URL)
     # conn = psycopg2.connect(dbname=DBNAME,host=LOCALHOST,port=5432,user=USERNAME,password=PASSWORD,sslmode="require")
@@ -306,9 +383,6 @@ def create_monthly_tasks():
     cur.execute('SELECT id FROM app_user')
     users = cur.fetchall()
     conn.commit()
-    cur.execute('SELECT * FROM app_user WHERE username = %s', (username,))
-    users = cur.fetchall() # fetchone()をexecute()の後に呼び出す
-    conn.commit()
     for user in users:
         cur.execute('SELECT * FROM debt_type WHERE user_id = %s ', (user['id'],))
         debt_types = cur.fetchall()
@@ -412,6 +486,12 @@ def register():
         hashed_password = generate_password_hash(password)
         cur.execute('INSERT INTO app_user (username, password_hash) VALUES (%s, %s)', (username, hashed_password))
         conn.commit()
+        cur.execute('SELECT use_id FROM app_user WHERE username = %s ', (username,))
+        newuserid = cur.fetchone()
+        conn.commit()
+        cur.execute('INSERT INTO expense_category (name, parent_category, user_id) VALUES (%s, %s, %s)', 
+                     ("その他", "変動費", newuserid))
+        conn.commit()
         conn.close()
 
         flash('登録が成功しました！ログインしてください。')
@@ -447,6 +527,53 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for('login'))
+
+# レシート画像アップロードルート
+@app.route('/upload_receipt', methods=['POST'])
+@login_required
+def upload_receipt():
+    # ファイルが正しく送信されているか確認
+    if 'receipt' not in request.files:
+        flash('ファイルがありません')
+        return redirect(url_for('dashboard'))
+
+    file = request.files['receipt']
+
+    if file.filename == '':
+        flash('ファイルが選択されていません')
+        return redirect(url_for('dashboard'))
+
+    if file and allowed_file(file.filename):
+        # ファイル名をセキュアにして保存
+        filename = secure_filename(file.filename)
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(file_path)
+
+        # アップロードされた画像からテキストを抽出
+        extracted_text = extract_text_from_image(file_path)
+        if extracted_text=="テキスト抽出に失敗しました":
+            flash('画像の登録に失敗しました')
+            return redirect(url_for('dashboard'))
+        
+        for item in extracted_text:
+            print(f"商品: {item['item']}, 金額: {item['amount']}円")
+            conn =  create_server_connection()
+            cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+            category_id  = categorize_item(item['item'], current_user.id)
+        # データベースに支出を追加
+            cur.execute('INSERT INTO expense (user_id, amount, category_id, description) VALUES (%s, %s, %s, %s)', 
+                     (current_user.id, item['amount'], category_id, "レシートからの登録"))
+            conn.commit()
+            conn.close()
+        flash('画像のアップロードが成功しました: {}'.format(extracted_text))
+
+        # 画像処理後、不要なら削除
+        os.remove(file_path)
+
+        return redirect(url_for('dashboard'))
+
+    flash('許可されていないファイル形式です')
+    return redirect(url_for('dashboard'))
 
 # タスク追加ルート
 @app.route('/add_task', methods=['GET', 'POST'])

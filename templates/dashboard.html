@@ -56,6 +56,13 @@
         <label for="income">収入額:</label>
         <input type="number" name="income" required>
         <button type="submit">追加</button>
+        <h3>レシート画像をアップロード</h3>
+        <form method="POST" action="{{ url_for('upload_receipt') }}" enctype="multipart/form-data">
+            {{ csrf_token() }} <!-- CSRFトークン -->
+            <label for="receipt">画像ファイル:</label>
+            <input type="file" name="receipt" accept="image/*" required>
+            <button type="submit">アップロード</button>
+        </form>
     </form>
     </div>
     <div class="card">
