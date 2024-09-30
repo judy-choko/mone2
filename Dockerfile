@@ -10,8 +10,8 @@ RUN apt-get update && \
     apt-get install -y wget fontconfig zip unzip fonts-migmix
 # パッケージのインストールや他の設定
 RUN wget https://noto-website-2.storage.googleapis.com/pkgs/NotoSansCJKjp-hinted.zip
-RUN unzip NotoSansCJKjp-hinted.zip -d /usr/share/fonts/NotoSansCJKjp
-RUN chmod 644 /usr/share/fonts/NotoSansCJKjp/*.otf
+RUN unzip NotoSansCJKjp-hinted.zip -d /usr/share/fonts/opentype/urw-base35/NotoSansCJKjp
+RUN chmod 644 /usr/share/fonts/opentype/urw-base35/NotoSansCJKjp/*.otf
 RUN fc-cache -fv
 RUN fc-list
 
