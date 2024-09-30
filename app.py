@@ -40,9 +40,11 @@ app.config['SECRET_KEY'] = SECRET_KEY
 csrf = CSRFProtect(app)
 
 # Japanese font
-font_path = url_for('static', filename='fonts/NotoSansCJKjp-DemiLight.otf')
-jp_font = fm.FontProperties(fname=font_path)
-plt.rcParams['font.family'] = jp_font.get_name()
+with app.app_context():
+    font_path = url_for('static', filename='fonts/NotoSansCJKjp-DemiLight.otf')
+    print(font_path)
+    jp_font = fm.FontProperties(fname=font_path)
+    plt.rcParams['font.family'] = jp_font.get_name()
 
 login_manager = LoginManager()
 login_manager.init_app(app)
