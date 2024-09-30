@@ -29,13 +29,13 @@ print(s3)
 # s3 = S3Connection(os.environ['SECRET_KEY'], os.environ['PASSWORD'], os.environ['LOCALHOST'], os.environ['USERNAME'], os.environ['DBNAME'], os.environ['DATABASE_URL'], os.environ['DBURL'])
 # load_dotenv()
 
-SECRET_KEY = os.environ['SECRET_KEY']
-PASSWORD = os.environ['PASSWORD']
-LOCALHOST = os.environ['LOCALHOST']
-USERNAME = os.environ['USERNAME']
-DBNAME = os.environ['DBNAME']
-DATABASE_URL = os.environ['DATABASE_URL']
-DBURL = os.environ['DBURL']
+SECRET_KEY = os.getenv('SECRET_KEY')
+PASSWORD = os.getenv('PASSWORD')
+LOCALHOST = os.getenv('LOCALHOST')
+USERNAME = os.getenv('USERNAME')
+DBNAME = os.getenv('DBNAME')
+DATABASE_URL = os.getenv('DATABASE_URL')
+DBURL = os.getenv('DBURL')
 # プッシュ
 print(SECRET_KEY)
 
