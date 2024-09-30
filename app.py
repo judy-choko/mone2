@@ -69,9 +69,10 @@ def get_fonts():
     return font_paths
 
 
-def gettext(base64_image):
+def gettext(data):
+    encoded_image = base64.b64encode(data).decode('utf-8')
     # Update the payload with the base64 image data
-    payload = f"-----011000010111000001101001\r\nContent-Disposition: form-data; name=\"base64\"\r\n\r\n{base64_image}\r\n-----011000010111000001101001--\r\n\r\n"
+    payload = f"-----011000010111000001101001\r\nContent-Disposition: form-data; name=\"base64\"\r\n\r\n{encoded_image}\r\n-----011000010111000001101001--\r\n\r\n"
 
     # Headers
     headers = {
@@ -522,9 +523,7 @@ def upload_receipt():
         file = form.image.data  # 画像ファイルを取得
         # 画像をバイナリ形式で読み込み
         image_data = file.read()
-        # base64でエンコード
-        encoded_image = base64.b64encode(image_data).decode('utf-8')
-        data_lest = gettext(encoded_image)
+        data_lest = gettext(image_data)
         if data_lest=="読み取りエラー":
             flash('読み取りできませんでした')
             return redirect(url_for('dashboard'))
