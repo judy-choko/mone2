@@ -534,6 +534,8 @@ def logout():
 @app.route('/upload_receipt', methods=['POST'])
 @login_required
 def upload_receipt():
+    if not os.path.exists(UPLOAD_FOLDER):
+        os.makedirs(UPLOAD_FOLDER)
     # ファイルが正しく送信されているか確認
     form = addreciptForm()
     if form.validate_on_submit():
@@ -858,8 +860,6 @@ def add_debt_type():
 
 
 if __name__ == '__main__':
-    if not os.path.exists(UPLOAD_FOLDER):
-        os.makedirs(UPLOAD_FOLDER)
     with app.app_context():
         init_db()  # アプリ起動時にデータベースを初期化
     app.run(host="0.0.0.0", port=8080, debug=True)
