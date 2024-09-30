@@ -4,11 +4,11 @@ FROM python:3.9-slim
 
 # 必要なパッケージをインストール
 RUN apt-get update && apt-get install -y \
+    apt-utils \
     pkg-config \
     libmariadb-dev \
     gcc \
     g++ \
-    apt-utils \
     fontconfig \
     libfreetype6-dev \
     && rm -rf /var/lib/apt/lists/*
