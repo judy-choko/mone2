@@ -859,6 +859,8 @@ def add_debt_type():
 
 
 if __name__ == '__main__':
+    if not os.path.exists(app.config['UPLOAD_FOLDER']):
+        os.makedirs(app.config['UPLOAD_FOLDER'])
     with app.app_context():
         init_db()  # アプリ起動時にデータベースを初期化
     app.run(host="0.0.0.0", port=8080, debug=True)
