@@ -571,11 +571,11 @@ def expense_category_chart():
     conn = create_server_connection()
     cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
     cur.execute('''
-        SELECT expense_category.name, SUM(expense.amount) as total_amount 
-        FROM expense
-        JOIN expense_category ON expense.category_id = expense_category.id
-        WHERE expense.user_id = %s 
-        GROUP BY expense.category_id
+    SELECT expense_category.name, SUM(expense.amount) as total_amount 
+    FROM expense
+    JOIN expense_category ON expense.category_id = expense_category.id
+    WHERE expense.user_id = %s
+    GROUP BY expense_category.name, expense_category.id
     ''', (current_user.id,))
     expenses = cur.fetchall()
     conn.close()
