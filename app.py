@@ -521,10 +521,10 @@ def upload_receipt():
     form = addreciptForm()
     if form.validate_on_submit():
         file = form.image.data  # 画像ファイルを取得
-        # 画像をバイナリ形式で読み込み
+        image_data = file.read()
         processed_image = process_image(file)
-        data_lest = gettext(processed_image)
-        flash('data_lest')
+        data_lest = gettext(image_data)
+        flash(data_lest)
         return redirect(url_for('dashboard'))
         if data_lest=="読み取りエラー":
             flash('読み取りできませんでした')
