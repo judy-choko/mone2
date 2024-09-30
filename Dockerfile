@@ -8,18 +8,29 @@ RUN apt-get update && apt-get install -y \
     libfreetype6-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# アプリケーションコードとフォントをコピー
-COPY /mone /app
-COPY ./fonts /usr/share/fonts
-
-# フォントキャッシュを更新
-RUN fc-cache -f -v
-
-# ワーキングディレクトリを設定
+# Create and set the working directory
 WORKDIR /app
 
-# 必要なパッケージをインストール
-RUN pip install --no-cache-dir -r requirements.txt
+# Copy the application files to the container
+COPY ./app.py /app/
+COPY ./forms.py /app/
+COPY ./models.py /app/
+COPY ./requirements.txt /app/
+COPY ./heroku.yml /app/
+COPY ./static /app/static/
+COPY ./templates /app/templates/
+
+# アプリケーションコードとフォントをコピー
+COPY ./fonts /usr/share/fonts
+
+# Copy and unzip the fonts to the appropriate directory
+COPY ./fonts.zip /usr/share/fonts/
+RUN unzip /usr/share/fonts/fonts.zip -d /usr/share/fonts/ \
+    && fc-cache -f -v
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r /app/requirements.txt
+
 
 # 環境変数の設定
 ENV FLASK_ENV=development
