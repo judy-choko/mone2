@@ -26,7 +26,6 @@ import psycopg2.extras
 from flask import Flask, render_template_string
 from werkzeug.utils import secure_filename
 from PIL import Image
-import pytesseract 
 import json
 import re
 import requests
@@ -97,7 +96,7 @@ def gettext(base64_image):
         )
     res = response.choices[0].message.content
     updated_json = json.loads(res)
-    return list_data
+    return updated_json
     
 def get_user_categories(user_id):
     conn = create_server_connection()
@@ -182,7 +181,7 @@ def init_db():
     ''')
     conn.commit()
     cur.execute('''
-CREATE TABLE IF NOT EXISTS payment_task (
+    CREATE TABLE IF NOT EXISTS payment_task (
     id SERIAL PRIMARY KEY,
     user_id INTEGER NOT NULL,
     debt_type_id INTEGER NOT NULL,
