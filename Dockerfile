@@ -1,19 +1,22 @@
 # Pythonの公式イメージを使用
 FROM python:3.9-slim
 
-# 作業ディレクトリを作成
+
+# 必要なパッケージをインストール
+RUN apt-get update && apt-get install -y \
+    fontconfig \
+    libfreetype6-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# アプリケーションコードとフォントをコピー
+COPY ./app /app
+COPY ./fonts /usr/share/fonts
+
+# フォントキャッシュを更新
+RUN fc-cache -f -v
+
+# ワーキングディレクトリを設定
 WORKDIR /app
-
-
-# パッケージリストの更新と必要なパッケージのインストール
-RUN apt-get update && \
-    apt-get install -y wget fontconfig zip unzip fonts-migmix
-# パッケージのインストールや他の設定
-RUN wget https://noto-website-2.storage.googleapis.com/pkgs/NotoSansCJKjp-hinted.zip
-RUN unzip NotoSansCJKjp-hinted.zip -d /usr/share/fonts/opentype/urw-base35/NotoSansCJKjp
-RUN chmod 644 /usr/share/fonts/opentype/urw-base35/NotoSansCJKjp/*.otf
-RUN fc-cache -fv
-RUN fc-list
 
 # 環境変数からパスワードを設定する
 ARG ROOTPASS
