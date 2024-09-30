@@ -9,10 +9,14 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # アプリケーションコードとフォントをコピー
+COPY /mone /app
 COPY ./fonts /usr/share/fonts
 
 # フォントキャッシュを更新
 RUN fc-cache -f -v
+
+# ワーキングディレクトリを設定
+WORKDIR /app
 
 # 必要なパッケージをインストール
 RUN pip install --no-cache-dir -r requirements.txt
