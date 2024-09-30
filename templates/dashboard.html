@@ -3,10 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ダッシュボード</title>
+    <title>My Money Memo - ダッシュボード</title>
 </head>
 <body>
+    <header></header>
+        <a href="{{ url_for('dashboard') }}">
+            <img src="{{ url_for('static', filename='images/apurilogo.png') }}" alt="My Money Memo Logo">
+        </a>
+        <h1>My Money Memo</h1>
+    </header>
+    <main>
     <!-- フラッシュメッセージの表示 -->
     {% with messages = get_flashed_messages() %}
         {% if messages %}
@@ -116,5 +124,6 @@
     </form>
 </div>
     <a href="{{ url_for('logout') }}">ログアウト</a>
+</main>
 </body>
 </html>

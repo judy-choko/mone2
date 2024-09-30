@@ -90,6 +90,46 @@ form {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
 }
+header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background-color: #f8f9fa;
+    padding: 10px 0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    text-align: center;
+}
+header img {
+    height: 50px;
+    vertical-align: middle;
+}
+header h1 {
+    display: inline;
+    font-size: 24px;
+    color: #333;
+    vertical-align: middle;
+}
+main {
+    margin-top: 100px; /* Ensure content isn't hidden behind the fixed header */
+}
+.card {
+    border: 1px solid #ccc;
+    padding: 15px;
+    margin: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.upload-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+}
+.upload-button:hover {
+    background-color: #0056b3;
+}
+
 input[type="text"],
 input[type="number"],
 select,
