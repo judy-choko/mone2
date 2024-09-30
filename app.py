@@ -105,11 +105,13 @@ def gettext(data):
     # url = "https://ocr-extract-text.p.rapidapi.com/ocr"
     
     # response = requests.post(url, data=payload, headers=headers)
-    return response
-    res_json = json.loads(response)
-    print(res_json)
+    # return response
+    res_json = response.json()
+    res_json_data = json.loads(res_json)
+    print(res_json_data)
+
     try:
-        text_value = res_json['fullText']
+        text_value = res_json_data['body']['fullText']
         print(text_value)
         # Print the extracted text
         client = OpenAI(
