@@ -106,9 +106,10 @@ def gettext(data):
     
     # response = requests.post(url, data=payload, headers=headers)
     return response
-    print(response)
+    res_json = json.loads(response)
+    print(res_json)
     try:
-        text_value = response.json()['fullText']
+        text_value = res_json['fullText']
         print(text_value)
         # Print the extracted text
         client = OpenAI(
