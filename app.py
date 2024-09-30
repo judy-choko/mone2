@@ -32,6 +32,8 @@ import requests
 import base64
 from openai import OpenAI
 from io import BytesIO
+from PIL import Image
+import io
 load_dotenv()
 
 SECRET_KEY = os.getenv('SECRET_KEY')
@@ -61,6 +63,14 @@ plt.rcParams['font.family'] = jp_font.get_name()
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
+
+def process_image(file):
+    image = Image.open(file)
+    rgb_image = image.convert("RGB")
+    img_io = io.BytesIO()
+    rgb_image.save(img_io, 'PNG')  # You can also use 'JPEG'
+    img_io.seek(0)
+    return img_io
 
 def get_fonts():
     font_paths = []
@@ -511,8 +521,8 @@ def upload_receipt():
     if form.validate_on_submit():
         file = form.image.data  # 画像ファイルを取得
         # 画像をバイナリ形式で読み込み
-        image_data = file.read()
-        data_lest = gettext(image_data)
+        processed_image = process_image(file)
+        data_lest = gettext(processed_image)
         if data_lest=="読み取りエラー":
             flash('読み取りできませんでした')
             return redirect(url_for('dashboard'))
