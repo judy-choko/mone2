@@ -61,7 +61,7 @@ def create_server_connection():
     conn=psycopg2.connect(
   database=DBNAME,
   user=USERNAME,
-  host="/tmp/",
+  host="/tmp",
   password=PASSWORD
 )
     # conn = psycopg2.connect(dbname=DBNAME,host=LOCALHOST,port=5432,user=USERNAME,password=PASSWORD,sslmode="require")
