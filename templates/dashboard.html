@@ -27,7 +27,7 @@
     <p><img src="{{ url_for('expense_category_chart') }}" alt="支出カテゴリ円グラフ"></p>
 </div>
     <div class="card">
-    <h2>借金返済タスク</h2>
+    <h2>支払いタスク</h2>
     <ul>
         {% for task in tasks %}
             <li>
@@ -40,7 +40,7 @@
                 {% endif %}
             </li>
         {% endfor %}
-        <h2>今月の返済額合計</h2>
+        <h2>今月の支払い額合計</h2>
         <p>{{ month_total_payment }}</p>
     </ul>
 </div>
@@ -56,35 +56,37 @@
         <label for="income">収入額:</label>
         <input type="number" name="income" required>
         <button type="submit">追加</button>
-        <h3>レシート画像をアップロード</h3>
-        <form method="POST" action="{{ url_for('upload_receipt') }}" enctype="multipart/form-data">
-            {{ csrf_token() }} <!-- CSRFトークン -->
-            <label for="receipt">画像ファイル:</label>
-            <input type="file" name="receipt" accept="image/*" required>
-            <button type="submit">アップロード</button>
-        </form>
     </form>
     </div>
     <div class="card">
     <h3>支出を登録</h3>
     <p><a href="{{ url_for('add_expense') }}">支出を追加する</a></p>
+    <p>または</p>
+    <h3>レシート画像をアップロード</h3>
+    <form method="POST" action="{{ url_for('upload_receipt') }}" enctype="multipart/form-data">
+        {{ csrf_token() }} <!-- CSRFトークン -->
+        <label for="receipt">画像ファイル:</label>
+        <input type="file" name="receipt" accept="image/*" required>
+        <button type="submit">アップロード</button>
+    </form>
+    </div>
     <div class="card">
-    <h2>借金の種類</h2>
+    <h2>定期的支払いの種類</h2>
     <ul>
         {% for debt in debt_types %}
-            <li>{{ debt.debt_name }}: 借金総額 {{ debt.total_debt }}円, 月々の返済額 {{ debt.monthly_payment }}円</li>
+            <li>{{ debt.debt_name }}: 支払い総額 {{ debt.total_debt }}円, 月々の支払い額 {{ debt.monthly_payment }}円</li>
         {% endfor %}
     </ul>
-</div>
+    </div>
     <div class="card">
-    <h3>借金の種類を登録</h3>
+    <h3>定期的支払いを登録</h3>
     <form method="POST" action="{{ url_for('add_debt_type') }}">
         {{ debt_form.hidden_tag() }}  <!-- CSRFトークン -->
-        <label for="debt_name">借金の名前:</label>
+        <label for="debt_name">支払いの名前:</label>
         <input type="text" name="debt_name" required>
-        <label for="total_debt">借金総額:</label>
+        <label for="total_debt">支払い総額:</label>
         <input type="number" name="total_debt" required>
-        <label for="monthly_payment">月々の返済額:</label>
+        <label for="monthly_payment">月々の支払い額:</label>
         <input type="number" name="monthly_payment" required>
         <button type="submit">追加</button>
     </form>
