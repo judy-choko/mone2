@@ -34,7 +34,6 @@ RUN fc-cache -f -v
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -r /app/requirements.txt
-RUN PATH=/usr/pgsql-9.3/lib:$PATH pip install --no-binary psycopg2 psycopg2
 
 # 環境変数の設定
 ENV FLASK_ENV=development
