@@ -9,7 +9,6 @@ WORKDIR /app
 # Copy the application files to the container
 COPY ./app/ /app/
 
-RUN fc-cache -f -v
 # Install Python dependencies
 RUN pip install --no-cache-dir -r /app/requirements.txt
 
