@@ -6,7 +6,7 @@ load_dotenv()
 
 
 GOOGLE_API_CREDS = os.environ["GOOGLE_API_CREDS"]
-DBURL = os.getenv('DBURL')
+DBURL = os.environ["DBURL"]
 
 app = Flask(__name__)
 
