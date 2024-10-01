@@ -821,10 +821,10 @@ def add_debt_type():
         conn.commit()
         conn.close()
 
-        flash('借金の種類と初回返済タスクが追加されました。')
+        flash('定期的支払いの種類と初回返済タスクが追加されました。')
         return redirect(url_for('dashboard'))
 
-    flash('借金の種類の追加に失敗しました。')
+    flash('定期的支払いの種類の追加に失敗しました。')
     return redirect(url_for('dashboard'))
 
 
