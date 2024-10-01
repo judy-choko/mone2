@@ -1,8 +1,6 @@
 # Pythonの公式イメージを使用
 FROM python:3.9-slim
 
-RUN echo "Database URL: "{$GOOGLE_API_CREDS}
-
 # Create and set the working directory
 WORKDIR /app
 
