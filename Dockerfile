@@ -22,4 +22,4 @@ ENV PATH="/home/chokokaruros/.local/bin:$PATH"
 EXPOSE 5000
 
 # Flaskアプリケーションを起動
-CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000","--log-level", "debug", "app:app"]
+CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:$PORT", "app:app"]
