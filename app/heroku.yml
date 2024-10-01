@@ -1,0 +1,14 @@
+setup:
+  addons:
+    - plan: heroku-postgresql:hobby-dev
+
+build:
+  docker:
+    web: Dockerfile
+
+release:
+  command:
+    - python -c 'from app import init_db; init_db()'
+
+run:
+  web: gunicorn -w 4 -b 0.0.0.0:8080 app:app

@@ -1,0 +1,164 @@
+/* 全体のスタイル */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+h1, h2, h3, p {
+    margin: 20px;
+    text-align: center;
+}
+
+form {
+    margin: 20px auto;
+    width: 80%;
+    max-width: 600px;
+    background-color: #fff;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+/* グラフやデータのカード風スタイル */
+.card {
+    background-color: #fff;
+    padding: 20px;
+    margin: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+.card img{
+    margin: 0 auto;
+    test-align:center;
+}
+/* リストのスタイル */
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    background-color: #e9e9e9;
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: left;
+}
+
+/* ボタンのスタイル */
+button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+/* リンクのスタイル */
+a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* 全体のスタイル */
+form {
+    margin: 20px auto;
+    width: 80%;
+    max-width: 600px;
+    background-color: #fff;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+.card form {
+    margin: 20px auto;
+    width: 80%;
+    max-width: 600px;
+    background-color: #fff;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background-color: #f8f9fa;
+    padding: 10px 0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    text-align: center;
+}
+header img {
+    height: 50px;
+    vertical-align: middle;
+}
+header h1 {
+    display: inline;
+    font-size: 24px;
+    color: #333;
+    vertical-align: middle;
+}
+main {
+    margin-top: 100px; /* Ensure content isn't hidden behind the fixed header */
+}
+.card {
+    border: 1px solid #ccc;
+    padding: 15px;
+    margin: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.upload-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+}
+.upload-button:hover {
+    background-color: #0056b3;
+}
+
+input[type="text"],
+input[type="number"],
+select,
+button {
+    width: 100%; /* フォーム内の要素をカード内にフィットさせる */
+    padding: 10px; /* 入力フィールドやボタンのパディングを増やす */
+    margin: 10px 0; /* 上下にスペースを確保 */
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    box-sizing: border-box; /* ボックスの幅にパディングや境界線を含む */
+}
+
+button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+/* レスポンシブデザイン */
+@media (max-width: 768px) {
+    form {
+        width: 90%;
+    }
+    
+    h1, h2, h3, p {
+        margin: 10px;
+    }
+}

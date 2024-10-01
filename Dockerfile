@@ -18,21 +18,10 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 # Copy the application files to the container
-COPY ./app.py /app/
-COPY ./.env /app/
-COPY ./forms.py /app/
-COPY ./models.py /app/
-COPY ./requirements.txt /app/
-COPY ./heroku.yml /app/
-COPY ./static /app/static/
-COPY ./templates /app/templates/
-COPY ./category_keywords.json /app/
-# アプリケーションコードとフォントをコピー
-COPY ./fonts /usr/share/fonts
+COPY ./app/ /app/
 
-# Copy and unzip the fonts to the appropriate directory
+
 RUN fc-cache -f -v
-
 # Install Python dependencies
 RUN pip install --no-cache-dir -r /app/requirements.txt
 
@@ -43,6 +32,18 @@ ENV FLASK_APP=app.py
 ENV LANG=ja_JP.UTF-8
 ENV PYTHONIOENCODING=utf_8
 # ENV FLASK_ENV=production
+
+# 環境変数を設定（必要に応じて適宜変更）
+ENV GOOGLE_API_CREDS=${GOOGLE_API_CREDS}
+ENV DBURL=${DBURL}
+ENV DATABASE_URL=${DATABASE_URL}
+ENV DBNAME=${DBNAME}
+ENV LOCALHOST=${LOCALHOST}
+ENV PASSWORD=${PASSWORD}
+ENV ROOTPASS=${ROOTPASS}
+ENV SECRET_KEY=${SECRET_KEY}
+ENV USERNAME=${USERNAME}
+ENV OPEN_AI_KEY=${OPEN_AI_KEY}
 
 ENV PATH="/home/chokokaruros/.local/bin:$PATH"
 

@@ -1,0 +1,10 @@
+# .envファイルをGitから無視
+.env
+
+# Google APIなどのJSON形式の鍵ファイルを無視
+*.json
+
+# Docker関連の一時ファイルを無視
+docker-compose.override.yml
+docker-compose.debug.yml
+*.local

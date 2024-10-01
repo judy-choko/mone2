@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>トップページ</title>
+
+</head>
+<body>
+    <div class="card">
+    <div class="container">
+        <h1>ようこそ！</h1>
+        <p>このアプリで借金や収支を簡単に管理しましょう。</p>
+
+        <div class="actions">
+          <p>  <a href="{{ url_for('login') }}" class="btn">ログイン</a></p>
+          <p>  <a href="{{ url_for('register') }}" class="btn">登録</a></p>
+        </div>
+    </div>
+    </div>
+</body>
+</html>

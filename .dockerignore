@@ -1,0 +1,9 @@
+# .envファイルをDockerビルド時に無視
+.env
+
+# 不要なJSONファイルや一時ファイルも無視
+*.json
+*.log
+.dockerignore
+.git
+.gitignore

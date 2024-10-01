@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>支出を追加</title>
+</head>
+<body>
+    <!-- フラッシュメッセージの表示 -->
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul class="flashes">
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+<h1>支出を追加</h1>
+<form method="POST">
+    {{ form.hidden_tag() }}
+    
+    <label for="amount">支出額:</label>
+    <input type="number" name="amount" required><br>
+
+    <label for="description">説明:</label>
+    <input type="text" name="description" required><br>
+
+    <!-- カテゴリを1つのドロップダウンとして表示 -->
+    <label for="category_id">カテゴリ:</label>
+    <select name="category_id">
+        <optgroup label="固定費">
+            {% for category in fixed_categories %}
+            <option value="{{ category.id }}">{{ category.name }}</option>
+            {% endfor %}
+        </optgroup>
+        <optgroup label="変動費">
+            {% for category in variable_categories %}
+            <option value="{{ category.id }}">{{ category.name }}</option>
+            {% endfor %}
+        </optgroup>
+    </select><br>
+
+    <button type="submit">支出を追加</button>
+</form>
+<a href="{{ url_for('dashboard') }}">ダッシュボードに戻る</a>
+</body>
+</html>

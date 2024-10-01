@@ -1,0 +1,17 @@
+numpy
+Flask-Migrate
+Flask-WTF
+Flask
+Flask-Login
+matplotlib
+Werkzeug
+gunicorn
+wtforms
+python-dotenv
+APScheduler
+flask-cors
+mysql-connector-python
+mysqlclient
+psycopg2
+openai
+requests
