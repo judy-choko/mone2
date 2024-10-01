@@ -137,6 +137,42 @@ def convert_datetime(s):
 sqlite3.register_adapter(datetime, adapt_datetime)
 sqlite3.register_converter("timestamp", convert_datetime)
 
+def create_categories(newuserid):
+    print("カテゴリ登録")
+    conn = create_server_connection()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    # 複数のデータを一度に挿入
+    data = [
+    ('住宅費', '固定費', newuserid),
+    ('水道光熱費', '固定費', newuserid),
+    ('通信料', '固定費', newuserid),
+    ('保険料', '固定費', newuserid),
+    ('車両費', '固定費', newuserid),
+    ('保育料・学費', '固定費', newuserid),
+    ('税金', '固定費', newuserid),
+    ('習い事', '固定費', newuserid),
+    ('交通費', '固定費', newuserid),
+    ('小遣い', '固定費', newuserid),
+    ('その他', '固定費', newuserid),
+    ('食費', '変動費', newuserid),
+    ('日用品費', '変動費', newuserid),
+    ('医療費', '変動費', newuserid),
+    ('子ども費', '変動費', newuserid),
+    ('被服費', '変動費', newuserid),
+    ('美容費', '変動費', newuserid),
+    ('交際費', '変動費', newuserid),
+    ('娯楽費', '変動費', newuserid),
+    ('雑費', '変動費', newuserid),
+    ('特別費', '変動費', newuserid)
+    ]
+    # SQLクエリ文を修正し、executemanyで一度に挿入
+    cur.executemany('''
+        INSERT INTO expense_category (name, parent_category, user_id)
+        VALUES (%s, %s, %s)
+    ''', data)
+    conn.commit()
+    conn.close()
+
 # データベース初期化関数
 def init_db():
     print("データベースを構築します")
@@ -469,11 +505,18 @@ def register():
                      ("その他", "変動費", newuserid))
         conn.commit()
         conn.close()
-
+        create_categories(newuserid)
         flash('登録が成功しました！ログインしてください。')
         return redirect(url_for('login'))
 
     return render_template('register.html', form=form)
+
+@app.route('/create', methods=['GET', 'POST'])
+@login_required
+def logsecretcommand():
+    create_categories(current_user.id)
+    flash('カテゴリを追加したよ。')
+    return redirect(url_for('dashboard'))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
