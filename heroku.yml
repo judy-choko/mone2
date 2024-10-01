@@ -9,4 +9,3 @@ build:
     PORT: 8080
 run:
   web: gunicorn -w 4 -b 0.0.0.0 --log-level debug app:app
-  worker: python app.py
