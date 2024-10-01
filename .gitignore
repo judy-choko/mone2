@@ -1,5 +1,5 @@
 # .envファイルをGitから無視
-.env
+# .env
 
 # Google APIなどのJSON形式の鍵ファイルを無視
 *.json
