@@ -33,12 +33,3 @@ ENV PYTHONIOENCODING=utf_8
 # ENV FLASK_ENV=production
 
 ENV PATH="/home/chokokaruros/.local/bin:$PATH"
-
-# SQLiteデータベースの初期化（テーブル作成などを行うスクリプトを実行）
-RUN python -c 'from app import init_db; init_db()'
-
-# ポート5000をコンテナ外部に公開
-EXPOSE 8080
-
-# Flaskアプリケーションを起動
-CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:8080","--log-level", "debug", "app:app"]
