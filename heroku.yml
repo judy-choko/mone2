@@ -1,7 +1,0 @@
-build:
-  docker:
-    web: Dockerfile
-  config:
-    PORT: $PORT
-run:
-    web: gunicorn -w 4 -b 0.0.0.0 --log-level debug app:app
