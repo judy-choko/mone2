@@ -33,7 +33,8 @@ from io import BytesIO
 from PIL import Image
 import io
 from google.cloud import vision
-
+from dotenv import load_dotenv
+load_dotenv()
 
 GOOGLE_API_CREDS = os.getenv('GOOGLE_API_CREDS')
 DBURL = os.getenv('DBURL')
