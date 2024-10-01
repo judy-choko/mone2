@@ -532,7 +532,7 @@ def upload_receipt():
                 # データベースに支出を追加
                 category_id = cur.fetchone()
                 conn.commit()
-                if category_id=="null":
+                if not category_id:
                     cur.execute('INSERT INTO expense (user_id, amount, category_id, description) VALUES (%s, %s, %s, %s)', 
                      (current_user.id, price, 1, name))
                     conn.commit()
