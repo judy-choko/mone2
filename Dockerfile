@@ -19,8 +19,6 @@ WORKDIR /app
 
 # Copy the application files to the container
 COPY ./app/ /app/
-COPY ./heroku.yml /app/
-
 
 RUN fc-cache -f -v
 # Install Python dependencies
