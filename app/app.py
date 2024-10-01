@@ -4,7 +4,7 @@ from flask import Flask
 from dotenv import load_dotenv
 load_dotenv()
 
-port = int(os.getenv('PORT'))
+port = int(os.getenv('PORT',8080))
 TORIAEZU = os.environ.get("TORIAEZU")
 app = Flask(__name__)
 
