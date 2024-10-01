@@ -166,11 +166,21 @@ def create_categories(newuserid):
     ('特別費', '変動費', newuserid)
     ]
     # SQLクエリ文を修正し、executemanyで一度に挿入
-    cur.executemany('''
-        INSERT INTO expense_category (name, parent_category, user_id)
-        VALUES (%s, %s, %s)
-    ''', data)
-    conn.commit()
+    for category in data:
+        # カテゴリがすでに存在するかをチェックする
+        cur.execute('''
+            SELECT * FROM expense_category 
+            WHERE name = %s AND parent_category = %s AND user_id = %s
+        ''', category)
+    
+        # 結果がない場合にのみ挿入
+        if cur.fetchone() is None:
+            cur.execute('''
+                INSERT INTO expense_category (name, parent_category, user_id) 
+                VALUES (%s, %s, %s)
+            ''', category)
+            conn.commit()
+    
     conn.close()
 
 # データベース初期化関数
