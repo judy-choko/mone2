@@ -2,17 +2,6 @@
 FROM python:3.9-slim
 
 RUN echo "Database URL: "{$GOOGLE_API_CREDS}
-# 必要なパッケージをインストール
-RUN apt-get update && apt-get install -y \
-    apt-utils \
-    pkg-config \
-    libpq-dev \
-    libmariadb-dev \
-    gcc \
-    g++ \
-    fontconfig \
-    libfreetype6-dev \
-    && rm -rf /var/lib/apt/lists/*
 
 # Create and set the working directory
 WORKDIR /app
