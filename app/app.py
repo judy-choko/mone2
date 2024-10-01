@@ -527,7 +527,7 @@ def upload_receipt():
                 cur.execute("""
                             SELECT id 
                             FROM expense_category 
-                            WHERE user_id = %s AND category_name = %s;
+                            WHERE user_id = %s AND name = %s;
                             """, (current_user.id, category))
                 # データベースに支出を追加
                 category_id = cur.fetchone()
