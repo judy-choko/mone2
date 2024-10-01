@@ -7,7 +7,6 @@ matplotlib
 Werkzeug
 gunicorn
 wtforms
-python-dotenv
 APScheduler
 flask-cors
 mysql-connector-python
@@ -15,3 +14,4 @@ mysqlclient
 psycopg2
 openai
 requests
+google-cloud-vision

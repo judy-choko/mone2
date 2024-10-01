@@ -1,7 +1,7 @@
 # Pythonの公式イメージを使用
 FROM python:3.9-slim
 
-
+RUN echo "Database URL: "{$GOOGLE_API_CREDS}
 # 必要なパッケージをインストール
 RUN apt-get update && apt-get install -y \
     apt-utils \
@@ -40,11 +40,10 @@ ENV DBURL=${DBURL}
 ENV DATABASE_URL=${DATABASE_URL}
 ENV DBNAME=${DBNAME}
 ENV LOCALHOST=${LOCALHOST}
-ENV PASSWORD=${PASSWORD}
+ENV USERS_PASSWORDS=${PASSWORD}
 ENV ROOTPASS=${ROOTPASS}
-ENV SECRET_KEY=${SECRET_KEY}
 ENV USERNAME=${USERNAME}
-ENV OPEN_AI_KEY=${OPEN_AI_KEY}
+ENV OPEN_AI_KEYS=${OPEN_AI_KEY}
 
 ENV PATH="/home/chokokaruros/.local/bin:$PATH"
 

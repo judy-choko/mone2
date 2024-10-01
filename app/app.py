@@ -11,7 +11,6 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, IntegerField, SelectField,FileField, SubmitField, PasswordField, DateField
 from flask_wtf.file import FileField, FileAllowed
 from wtforms.validators import DataRequired
-from dotenv import load_dotenv
 from datetime import datetime
 import matplotlib.font_manager as fm
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -29,36 +28,36 @@ from PIL import Image
 import json
 import re
 import requests
-import base64
 from openai import OpenAI
 from io import BytesIO
 from PIL import Image
 import io
-# load_dotenv()
+from google.cloud import vision
+
 
 GOOGLE_API_CREDS = os.getenv('GOOGLE_API_CREDS')
 DBURL = os.getenv('DBURL')
 DATABASE_URL = os.getenv('DATABASE_URL')
 DBNAME = os.getenv('DBNAME')
 LOCALHOST = os.getenv('LOCALHOST')
-PASSWORD = os.getenv('PASSWORD')
+USERS_PASSWORDS = os.getenv('USERS_PASSWORDS')
 ROOTPASS = os.getenv('ROOTPASS')
-SECRET_KEY = os.getenv('SECRET_KEY')
 USERNAME = os.getenv('USERNAME')
-OPEN_AI_KEY = os.getenv('OPEN_AI_KEY')
+OPEN_AI_KEYS = os.getenv('OPEN_AI_KEYS')
 
 # プッシュ
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
+GOOGLE_API_CREDS=os.getenv('GOOGLE_API_CREDS')
 file = json.loads(GOOGLE_API_CREDS)
-path = 'data/cred.json'
+path = 'data/test.json'
 with open(path, 'w') as f:
     json.dump(file, f, indent=2)
 os.environ['GOOGLE_APPLICATION_CREDENTIALS']=path
 
 app = Flask(__name__)
 CORS(app)
-app.config['SECRET_KEY'] = SECRET_KEY
+app.config['SECRET_KEY'] = SECRET_KEYS
 csrf = CSRFProtect(app)
 
 # Japanese font
@@ -71,13 +70,6 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
-def process_image(file):
-    image = Image.open(file)
-    rgb_image = image.convert("RGB")
-    img_io = io.BytesIO()
-    rgb_image.save(img_io, 'PNG')  # You can also use 'JPEG'
-    img_io.seek(0)
-    return img_io
 
 def get_fonts():
     font_paths = []
@@ -87,35 +79,15 @@ def get_fonts():
 
 
 def gettext(data):
-    # encoded_image = base64.b64encode(data.getvalue()).decode('utf-8')
-    # encoded_image = base64.b64encode(data).decode('utf-8')
-    # Update the payload with the base64 image data
-    # payload = f"-----011000010111000001101001\r\nContent-Disposition: form-data; name=\"base64\"\r\n\r\n{encoded_image}\r\n-----011000010111000001101001--\r\n\r\n"
-    payload = f"-----011000010111000001101001\r\nContent-Disposition: form-data; name=\"image\"\r\n\r\n{data}\r\n-----011000010111000001101001--\r\n\r\n"
-    files = {
-        'image': data
-    }
-    headers = {
-        "x-rapidapi-key": RAPID_KEY,
-        "x-rapidapi-host": "ocr-wizard.p.rapidapi.com"
-    }
-    url = "https://ocr-wizard.p.rapidapi.com/ocr"
-    response = requests.post(url, files=files, headers=headers)
-    # Headers
-    # headers = {
-    #     "x-rapidapi-key": RAPID_KEY,
-    #     "x-rapidapi-host": "ocr-wizard.p.rapidapi.com",
-    #     "Content-Type": "multipart/form-data; boundary=---011000010111000001101001"
-    # }
-    #     "x-rapidapi-host": "ocr-extract-text.p.rapidapi.com",
-    # Make the POST request
-    # url = "https://ocr-extract-text.p.rapidapi.com/ocr"
-    
-    # response = requests.post(url, data=payload, headers=headers)
-    # return response
-    res_json = response.json()
-    res_json_data = json.loads(res_json)
-    print(res_json_data)
+    client = vision.ImageAnnotatorClient()
+    content = data.read()
+    image = vision.Image(content=content)
+    response =  client.document_text_detection(
+            image=image,
+            image_context={'language_hints': ['ja']}
+        )
+    print(response.text_annotations[0].description)
+    return response.text_annotations[0].description
 
     try:
         text_value = res_json_data['body']['fullText']
@@ -123,7 +95,7 @@ def gettext(data):
         # Print the extracted text
         client = OpenAI(
             # This is the default and can be omitted
-            api_key=OPEN_AI_KEY,
+            api_key=OPEN_AI_KEYS,
         )
         prompt = '購入した商品と金額のデータを作成して。JSON形式のデータのみ返してください。コードブロックとしてではなく、直接JSONデータだけをお願いします。カテゴリは固定費：住宅費、水道光熱費、通信料、保険料、車両費、保育料・学費、税金、習い事、交通費、小遣い、その他。変動費：食費、日用品費、医療費、子ども費、被服費、美容費、交際費、娯楽費、雑費、特別費。の中から選び、データのフォーマットは次の通りです。{data:[{"name":項目名,"price":金額,"parent_category":固定費or変動費,"category":カテゴリ名},]}以下データ：'+response.json()['fullText']
         messages = [{"role": "system", "content": prompt}]
@@ -542,9 +514,7 @@ def upload_receipt():
     form = addreciptForm()
     if form.validate_on_submit():
         file = form.image.data  # 画像ファイルを取得
-        image_data = file.read()
-        processed_image = process_image(file)
-        data_lest = gettext(image_data)
+        data_lest = gettext(file)
         flash(data_lest)
         return redirect(url_for('dashboard'))
         if data_lest=="読み取りエラー":
