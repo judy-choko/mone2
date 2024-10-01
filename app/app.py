@@ -508,6 +508,8 @@ def register():
         hashed_password = generate_password_hash(password)
         cur.execute('INSERT INTO app_user (username, password_hash) VALUES (%s, %s)', (username, hashed_password))
         conn.commit()
+        conn.close()
+        conn =  create_server_connection()
         cur.execute('SELECT use_id FROM app_user WHERE username = %s ', (username,))
         newuserid = cur.fetchone()
         conn.commit()
