@@ -86,18 +86,15 @@ def gettext(data):
             image=image,
             image_context={'language_hints': ['ja']}
         )
-    print(response.text_annotations[0].description)
-    return response.text_annotations[0].description
 
     try:
-        text_value = res_json_data['body']['fullText']
-        print(text_value)
+        meisai = response.text_annotations[0].description
         # Print the extracted text
         client = OpenAI(
             # This is the default and can be omitted
             api_key=OPEN_AI_KEYS,
         )
-        prompt = '購入した商品と金額のデータを作成して。JSON形式のデータのみ返してください。コードブロックとしてではなく、直接JSONデータだけをお願いします。カテゴリは固定費：住宅費、水道光熱費、通信料、保険料、車両費、保育料・学費、税金、習い事、交通費、小遣い、その他。変動費：食費、日用品費、医療費、子ども費、被服費、美容費、交際費、娯楽費、雑費、特別費。の中から選び、データのフォーマットは次の通りです。{data:[{"name":項目名,"price":金額,"parent_category":固定費or変動費,"category":カテゴリ名},]}以下データ：'+response.json()['fullText']
+        prompt = '購入した商品と金額のデータを作成して。JSON形式のデータのみ返してください。コードブロックとしてではなく、直接JSONデータだけをお願いします。カテゴリは固定費：住宅費、水道光熱費、通信料、保険料、車両費、保育料・学費、税金、習い事、交通費、小遣い、その他。変動費：食費、日用品費、医療費、子ども費、被服費、美容費、交際費、娯楽費、雑費、特別費。の中から選び、データのフォーマットは次の通りです。{data:[{"name":項目名,"price":金額,"parent_category":固定費or変動費,"category":カテゴリ名},]}以下データ：'+meisai
         messages = [{"role": "system", "content": prompt}]
         response = client.chat.completions.create(
                 model="gpt-4o",
@@ -108,7 +105,7 @@ def gettext(data):
         return updated_json
     except KeyError:
         print("Key 'text' not found in the JSON response")
-        return response
+        return "読み取りエラー"
     
 def get_user_categories(user_id):
     conn = create_server_connection()
@@ -515,8 +512,7 @@ def upload_receipt():
     if form.validate_on_submit():
         file = form.image.data  # 画像ファイルを取得
         data_lest = gettext(file)
-        flash(data_lest)
-        return redirect(url_for('dashboard'))
+
         if data_lest=="読み取りエラー":
             flash('読み取りできませんでした')
             return redirect(url_for('dashboard'))
