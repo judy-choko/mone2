@@ -1,6 +1,16 @@
 build:
   docker:
     web: Dockerfile
+  config:
+    GOOGLE_API_CREDS: $GOOGLE_API_CREDS
+    DBURL: $DBURL
+    DATABASE_URL: $DATABASE_URL
+    DBNAME: $DBNAME
+    LOCALHOST: $LOCALHOST
+    USERS_PASSWORDS: $PASSWORD
+    ROOTPASS: $ROOTPASS
+    USERNAME: $USERNAME
+    OPEN_AI_KEYS: $OPEN_AI_KEY
 release:
   image: web
   command:

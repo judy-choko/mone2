@@ -36,7 +36,7 @@ from google.cloud import vision
 from dotenv import load_dotenv
 load_dotenv()
 
-GOOGLE_API_CREDS = os.getenv('GOOGLE_API_CREDS')
+GOOGLE_API_CREDS = os.environ["GOOGLE_API_CREDS"]
 DBURL = os.getenv('DBURL')
 DATABASE_URL = os.getenv('DATABASE_URL')
 DBNAME = os.getenv('DBNAME')
