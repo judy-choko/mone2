@@ -532,9 +532,15 @@ def upload_receipt():
                 # データベースに支出を追加
                 category_id = cur.fetchone()
                 conn.commit()
-                cur.execute('INSERT INTO expense (user_id, amount, category_id, description) VALUES (%s, %s, %s, %s)', 
+                if category_id=="null":
+                    cur.execute('INSERT INTO expense (user_id, amount, category_id, description) VALUES (%s, %s, %s, %s)', 
+                     (current_user.id, price, 1, name))
+                    conn.commit()
+
+                else :
+                    cur.execute('INSERT INTO expense (user_id, amount, category_id, description) VALUES (%s, %s, %s, %s)', 
                      (current_user.id, price, category_id, name))
-                conn.commit()
+                    conn.commit()
                 conn.close()
             flash('画像のアップロードが成功しました')
             return redirect(url_for('dashboard'))
