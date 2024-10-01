@@ -1,0 +1,13 @@
+setup:
+  addons:
+    - plan: heroku-postgresql
+      as: DATABASE
+build:
+  docker:
+    web: Dockerfile
+    worker: worker/Dockerfile
+  config:
+    PORT: 8080
+run:
+  web: gunicorn -w 4 -b 0.0.0.0 --log-level debug app:app
+  worker: python app.py
