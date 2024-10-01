@@ -8,7 +8,7 @@ app = Flask(__name__)
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    return "hello"
+    return str(TORIAEZU)
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
