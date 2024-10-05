@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}" type="image/x-icon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Money Memo - カテゴリ設定</title>
+</head>
+<body>
+    <header>
+        <a href="{{ url_for('dashboard') }}">
+            <img src="{{ url_for('static', filename='images/apurilogo.png') }}" alt="My Money Memo Logo">
+        </a>
+        <h1>My Money Memo</h1>
+    </header>
+    <main>
+        <!-- フラッシュメッセージの表示 -->
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul class="flashes">
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+    <div class="card">
+    <h1>カテゴリを設定</h1>
+    <form method="POST">
+        {{ form.hidden_tag() }}  <!-- CSRFトークン -->
+        {{ form.tasks.label }} {{ form.tasks() }}
+        {{ form.category.label }} {{ form.category() }}<br><br>
+        <button type="submit">{{ form.submit.label }}</button>
+    </form>
+    </div>
+    <a href="{{ url_for('dashboard') }}">ダッシュボードに戻る</a>
+    </main>
+</body>
+</html>

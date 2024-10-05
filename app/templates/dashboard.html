@@ -2,10 +2,149 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Money Memo - ダッシュボード</title>
+    <style>
+        main {
+            width: 70%;
+            margin: 0 auto;
+            text-align: center;
+        }
+        body {
+            font-family: 'M PLUS Rounded 1c', 'Noto Sans JP', sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            display: flex;
+            text-align: center;
+            align-items: center;
+            padding: 20px;
+            background-color: #08af2f;
+            color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            margin-left: 20px;
+            text-align: center;
+        }
+
+        header img {
+            width: 50px;
+            height: auto;
+        }
+
+        main {
+            padding: 20px;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card h2, .card h3 {
+            color: #28A745;
+        }
+
+        .card p {
+            color: #333;
+        }
+        /* フォームのスタイル */
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+
+        .btn-submit {
+            background-color: #28A745;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-submit:hover {
+            background-color: #66BB6A;
+        }
+
+        button, .btn-link {
+            display: inline-block;
+            background-color: #28A745;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-size: 16px;
+            margin: 10px 0;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover, .btn-link:hover {
+            background-color: #66BB6A;
+        }
+
+        button i, .btn-link i {
+            margin-right: 8px;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        ul li {
+            list-style: none;
+            margin-bottom: 10px;
+        }
+
+        ul li a {
+            color: #28A745;
+            text-decoration: none;
+        }
+
+        ul li a:hover {
+            color: #66BB6A;
+        }
+
+        .flashes {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+
+        .flashes li {
+            background-color: #f8d7da;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            color: #721c24;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #28A745;
+            color: white;
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -14,116 +153,130 @@
         </a>
         <h1>My Money Memo</h1>
     </header>
+
     <main>
-    <!-- フラッシュメッセージの表示 -->
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            <ul class="flashes">
-                {% for message in messages %}
-                    <li>{{ message }}</li>
+        <!-- フラッシュメッセージの表示 -->
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul class="flashes">
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
+        <h1>{{ current_user.username }}のダッシュボード</h1>
+
+        <div class="card">
+            <h2>ステータス</h2>
+            <p><i class="fas fa-yen-sign"></i> 1日の支出可能額：{{ daily_allowance }}円、前月の繰り越し額：{{ income_expense.remaining_balance }}円</p>
+        </div>
+
+        <div class="card">
+            <h2>支出カテゴリごとのグラフ</h2>
+            <p><img src="{{ url_for('expense_category_chart') }}" alt="支出カテゴリ円グラフ"></p>
+        </div>
+
+        <div class="card">
+            <h2>支払いタスク</h2>
+            <ul>
+                {% for task in tasks %}
+                    <li>
+                        {{ task.debt_name }}: {{ task.monthly_payment }}円
+                        {% if task.is_completed %}
+                            <strong>完了</strong>
+                        {% else %}
+                            <a href="{{ url_for('complete_task', task_id=task.id) }}">完了する</a>
+                        {% endif %}
+                    </li>
                 {% endfor %}
             </ul>
-        {% endif %}
-    {% endwith %}
-    <h1>{{ current_user.username }}のダッシュボード</h1>
-    <div class="card">
-    <h2>ステータス</h2>
-    <p>1日の支出可能額：{{ daily_allowance }}円、前月の繰り越し額：{{ income_expense.remaining_balance }}円</p>
-    </div>
-    <div class="card">
-    <h2>支出カテゴリごとのグラフ</h2>
-    <p><img src="{{ url_for('expense_category_chart') }}" alt="支出カテゴリ円グラフ"></p>
-</div>
-    <div class="card">
-    <h2>支払いタスク</h2>
-    <ul>
-        {% for task in tasks %}
-            <li>
-                {{ task.debt_name }}
-                {{ task.monthly_payment }}
-                {% if task.is_completed %}
-                    <strong>完了</strong>
-                {% else %}
-                    <a href="{{ url_for('complete_task', task_id=task.id) }}">完了する</a>
-                {% endif %}
-            </li>
-        {% endfor %}
-        <h2>今月の支払い額合計</h2>
-        <p>{{ month_total_payment }}</p>
-    </ul>
-</div>
-    <div class="card">
-    <h2>今月の収支</h2>
-    <p>収入: {{ income_expense.income if income_expense else 0 }}円</p>
-    <p>支出: {{ total_expense }}円</p>
-    </div>
-    <div class="card">
-    <h3>収入を登録</h3>
-    <form method="POST" action="{{ url_for('add_income') }}">
-        {{ income_form.hidden_tag() }}  <!-- CSRFトークン -->
-        <label for="income">収入額:</label>
-        <input type="number" name="income" required>
-        <button type="submit">追加</button>
-    </form>
-    </div>
-    <div class="card">
-    <h3>支出を登録</h3>
-    <p><a href="{{ url_for('add_expense') }}">支出を追加する</a></p>
-    <p>または</p>
-    <h3>レシート画像をアップロード</h3>
-    <form method="POST" action="{{ url_for('upload_receipt') }}" enctype="multipart/form-data">
-        {{ recipt_form.hidden_tag() }} <!-- CSRFトークン -->
-        {{ recipt_form.image.label }} {{ recipt_form.image() }}<br><br>
-        {{ recipt_form.submit() }}
-    </form>
-    </div>
-    <div class="card">
-    <h2>定期的支払いの種類</h2>
-    <ul>
-        {% for debt in debt_types %}
-            <li>{{ debt.debt_name }}: 支払い総額 {{ debt.total_debt }}円, 月々の支払い額 {{ debt.monthly_payment }}円</li>
-        {% endfor %}
-    </ul>
-    </div>
-    <div class="card">
-    <h3>定期的支払いを登録</h3>
-    <form method="POST" action="{{ url_for('add_debt_type') }}">
-        {{ debt_form.hidden_tag() }}  <!-- CSRFトークン -->
-        <label for="debt_name">支払いの名前:</label>
-        <input type="text" name="debt_name" required>
-        <label for="total_debt">支払い総額:</label>
-        <input type="number" name="total_debt" required>
-        <label for="monthly_payment">月々の支払い額:</label>
-        <input type="number" name="monthly_payment" required>
-        <button type="submit">追加</button>
-    </form>
-</div>
-    <div class="card">
-    <h2>支出カテゴリ</h2>
-    <h3>カテゴリを追加</h3>
-    <form method="POST" action="{{ url_for('add_category') }}">
-        {{ category_form.hidden_tag() }}  <!-- CSRFトークン -->
-        <label for="category_name">カテゴリ名:</label>
-        <input type="text" name="category_name" required><br>
+            <h3>今月の支払い額合計</h3>
+            <p>{{ month_total_payment }}円</p>
+        </div>
 
-        <label for="parent_category">大カテゴリ:</label>
-        <select name="parent_category" required>
-            <option value="固定費">固定費</option>
-            <option value="変動費">変動費</option>
-        </select><br>
+        <div class="card">
+            <h2>今月の収支</h2>
+            <p>収入: {{ income_expense.income if income_expense else 0 }}円</p>
+            <p>支出: {{ total_expense }}円</p>
+        </div>
 
-        <button type="submit">カテゴリを追加</button>
-    </form>
-</div>
-<div class="card">
-    <form method="POST" action="{{ url_for('set_reset_day') }}">
-        {{ reset_form.hidden_tag() }}
-        <label for="reset_day">リセット日:</label>
-        {{ reset_form.reset_day }}
-        <button type="submit">リセット日を設定</button>
-    </form>
-</div>
-    <a href="{{ url_for('logout') }}">ログアウト</a>
-</main>
+        <div class="card">
+            <h3><i class="fas fa-plus"></i> 収入を登録</h3>
+            <form method="POST" action="{{ url_for('add_income') }}">
+                {{ income_form.hidden_tag() }}  <!-- CSRFトークン -->
+                <label for="income">収入額:</label>
+                <input type="number" name="income" required>
+                <button type="submit"><i class="fas fa-plus-circle"></i> 追加</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <h3><i class="fas fa-money-bill"></i> 支出を登録</h3>
+            <p><a href="{{ url_for('add_expense') }}" class="btn-link"><i class="fas fa-plus"></i> 支出を追加する</a></p>
+            <p>または</p>
+            <h3><i class="fas fa-receipt"></i> レシート画像をアップロード</h3>
+            <form method="POST" action="{{ url_for('upload_receipt') }}" enctype="multipart/form-data">
+                {{ recipt_form.hidden_tag() }} <!-- CSRFトークン -->
+                {{ recipt_form.image(class_="form-control", id="receipt-image") }}<br><br>
+                {{ recipt_form.submit(class_="btn btn-submit") }}
+            </form>
+        </div>
+
+        <div class="card">
+            <h2>定期的支払いの種類</h2>
+            <ul>
+                {% for debt in debt_types %}
+                    <li>{{ debt.debt_name }}: 支払い総額 {{ debt.total_debt }}円, 月々の支払い額 {{ debt.monthly_payment }}円</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="card">
+            <h3><i class="fas fa-plus"></i> 定期的支払いを登録</h3>
+            <form method="POST" action="{{ url_for('add_debt_type') }}">
+                {{ debt_form.hidden_tag() }}  <!-- CSRFトークン -->
+                <label for="debt_name">支払いの名前:</label>
+                <input type="text" name="debt_name" required>
+                <label for="total_debt">支払い総額:</label>
+                <input type="number" name="total_debt" required>
+                <label for="monthly_payment">月々の支払い額:</label>
+                <input type="number" name="monthly_payment" required>
+                <button type="submit"><i class="fas fa-plus-circle"></i> 追加</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <h2>支出カテゴリ</h2>
+            <h3><i class="fas fa-plus"></i> カテゴリを追加</h3>
+            <form method="POST" action="{{ url_for('add_category') }}">
+                {{ category_form.hidden_tag() }}  <!-- CSRFトークン -->
+                <label for="category_name">カテゴリ名:</label>
+                <input type="text" name="category_name" required><br>
+                <label for="parent_category">大カテゴリ:</label>
+                <select name="parent_category" required>
+                    <option value="固定費">固定費</option>
+                    <option value="変動費">変動費</option>
+                </select><br>
+                <button type="submit"><i class="fas fa-plus-circle"></i> カテゴリを追加</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <form method="POST" action="{{ url_for('set_reset_day') }}">
+                {{ reset_form.hidden_tag() }}
+                <label for="reset_day">リセット日:</label>
+                {{ reset_form.reset_day }}
+                <button type="submit"><i class="fas fa-calendar-alt"></i> リセット日を設定</button>
+            </form>
+        </div>
+
+        <a href="{{ url_for('logout') }}" class="btn-link"><i class="fas fa-sign-out-alt"></i> ログアウト</a>
+    </main>
+
+    <footer>
+        © 2024 My Money Memo | All Rights Reserved
+    </footer>
 </body>
 </html>

@@ -257,23 +257,48 @@ def init_db():
     ''')
     conn.commit()
     
-    # デフォルトカテゴリが存在しない場合のみ挿入
-    cur.execute('SELECT COUNT(*) FROM expense_category')
-    count = cur.fetchone()[0]
+    # category_id 列を payment_task テーブルに追加
+    cur.execute('''
+            ALTER TABLE payment_task
+            ADD COLUMN IF NOT EXISTS category_id INTEGER;
+        ''')
+
+        # 外部キー制約を追加して、category_id が expense_category テーブルの id に紐づくようにする
+    cur.execute('''
+            ALTER TABLE payment_task
+            ADD CONSTRAINT fk_category
+            FOREIGN KEY (category_id) 
+            REFERENCES expense_category(id);
+     ''')
+
     conn.commit()
-    
-    if count == 0:
-        # デフォルトの支出カテゴリを挿入
-        default_categories = [
-            ('家賃', '固定費'),
-            ('光熱費', '固定費'),
-            ('食費', '変動費'),
-            ('交通費', '変動費')
-        ]
-        for name, parent_category in default_categories:
-            cur.execute('INSERT INTO expense_category (name, parent_category, user_id) VALUES (%s, %s, 0)', (name, parent_category))
-            conn.commit()
-    
+
+    # category_id 列を payment_task テーブルに追加
+    cur.execute('''
+            ALTER TABLE debt_type
+            ADD COLUMN IF NOT EXISTS category_id INTEGER;
+        ''')
+
+        # 外部キー制約を追加して、category_id が expense_category テーブルの id に紐づくようにする
+    cur.execute('''
+            ALTER TABLE debt_type
+            ADD CONSTRAINT fk_category
+            FOREIGN KEY (category_id) 
+            REFERENCES expense_category(id);
+     ''')
+
+    conn.commit()
+    cur.execute('''
+        ALTER TABLE debt_type
+        ALTER COLUMN total_debt SET DEFAULT 0;
+    ''')
+
+    cur.execute('''
+        ALTER TABLE debt_type
+        ADD CONSTRAINT check_total_debt CHECK (total_debt >= 0);
+    ''')
+
+    conn.commit()
     conn.close()
     
 
@@ -283,6 +308,10 @@ class LoginForm(FlaskForm):
     password = PasswordField('パスワード', validators=[DataRequired()])
     submit = SubmitField('ログイン')
 
+class AssignCategoryForm(FlaskForm):
+    tasks =  SelectField('タスク', validators=[DataRequired()])
+    category = SelectField('カテゴリ', validators=[DataRequired()], coerce=int)
+    submit = SubmitField('カテゴリを設定')
 class addreciptForm(FlaskForm):
     image = FileField('画像を選択', validators=[DataRequired(), FileAllowed(['jpg', 'png','jpeg','JPEG','PNG','JPG'], '画像形式のみ許可されています')])
     submit = SubmitField('アップロード')
@@ -529,6 +558,46 @@ def logsecretcommand():
     create_categories(current_user.id)
     flash('カテゴリを追加したよ。')
     return redirect(url_for('dashboard'))
+
+@app.route('/assign_category', methods=['GET', 'POST'])
+@login_required
+def assign_category():
+    conn = create_server_connection()
+    cur = conn.cursor()
+
+    # タスク情報を取得
+    cur.execute('''
+        SELECT debt_name FROM payment_task
+        WHERE category_id IS NULL
+        AND user_id = %s
+    ''', (current_user.id,))
+    tasks = cur.fetchone()
+
+    if not tasks:
+        flash('タスクが見つかりません。')
+        return redirect(url_for('dashboard'))
+
+    # ユーザーのカテゴリを取得して選択肢に設定
+    cur.execute('SELECT id, name FROM expense_category WHERE user_id = %s', (current_user.id,))
+    categories = cur.fetchall()
+
+    form = AssignCategoryForm()
+    form.category.choices = [(category[0], category[1]) for category in categories]
+    form.tasks.choices = [(task) for task in tasks]
+    if form.validate_on_submit():
+        # 選択されたカテゴリIDをタスクに割り当てる
+        cur.execute('UPDATE payment_task SET category_id = %s WHERE debt_name = %s AND user_id = %s', 
+                    (form.category.data, form.tasks.data, current_user.id))
+        
+        conn.commit()
+        cur.execute('UPDATE debt_type SET category_id = %s WHERE debt_name = %s AND user_id = %s', 
+                    (form.category.data, form.tasks.data, current_user.id))
+        conn.commit()
+        flash('カテゴリが設定されました。')
+        return redirect(url_for('assign_category'))
+
+    conn.close()
+    return render_template('assign_category.html', form=form)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
